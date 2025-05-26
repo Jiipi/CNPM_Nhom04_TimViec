@@ -1,0 +1,343 @@
+<%- contentFor('body') %>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="modal-content p-0" style="max-width: 500px; width: 100%; margin: 40px auto;">
+        <div class="modal-header border-0 pb-0 d-flex justify-content-end">
+            <a href="/" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body px-4 pt-0 pb-4">
+            <div class="text-center mb-4">
+                <img src="/images/logo.jpg" alt="MY JOB Logo" class="logo mb-2" style="max-width: 120px;">
+                <h4 class="font-weight-bold">Đăng ký/ Đăng nhập</h4>
+                <p class="text-muted">Liên kết tài khoản của bạn để tiếp tục sử dụng dịch vụ</p>
+            </div>
+            
+            <ul class="nav nav-tabs nav-fill mb-4" id="registerTabs" role="tablist">
+                <li class="nav-item flex-grow-1" role="presentation">
+                    <button class="nav-link active w-100" id="register-candidate-tab" data-bs-toggle="tab" data-bs-target="#register-candidate" type="button" role="tab" aria-controls="register-candidate" aria-selected="true">Ứng viên</button>
+                </li>
+                <li class="nav-item flex-grow-1" role="presentation">
+                    <button class="nav-link w-100" id="register-recruiter-tab" data-bs-toggle="tab" data-bs-target="#register-recruiter" type="button" role="tab" aria-controls="register-recruiter" aria-selected="false">Nhà tuyển dụng</button>
+                </li>
+            </ul>
+            
+            <!-- Thông báo kết quả đăng ký -->
+            <div id="registerResult" class="alert d-none mb-3"></div>
+            
+            <div class="tab-content" id="registerTabContent">
+                <!-- Tab đăng ký ứng viên -->
+                <div class="tab-pane fade show active" id="register-candidate" role="tabpanel" aria-labelledby="register-candidate-tab">
+                    <form id="candidateRegisterForm" method="post">
+                        <div class="mb-3">
+                            <label for="candidate_hoTen" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="candidate_hoTen" name="hoTen" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="candidate_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="candidate_email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="candidate_sdt" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="candidate_sdt" name="sdt" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="candidate_tenDN" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="candidate_tenDN" name="tenDN" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="candidate_matKhau" class="form-label">Mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="candidate_matKhau" name="matKhau" minlength="6" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#candidate_matKhau">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">Mật khẩu phải có ít nhất 6 ký tự</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="candidate_xacNhanMatKhau" class="form-label">Xác nhận mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="candidate_xacNhanMatKhau" name="xacNhanMatKhau" minlength="6" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#candidate_xacNhanMatKhau">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="candidate_dieuKhoan" name="dieuKhoan" required>
+                            <label class="form-check-label" for="candidate_dieuKhoan">
+                                Tôi đồng ý với <a href="#" target="_blank">Điều khoản sử dụng</a> và <a href="#" target="_blank">Chính sách bảo mật</a>
+                            </label>
+                        </div>
+                        
+                        <input type="hidden" name="vaiTro" value="UngVien">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Đăng Ký</button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <p>Đã có tài khoản? <a href="/ung-vien/dang-nhap">Đăng nhập ngay</a></p>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Tab đăng ký nhà tuyển dụng -->
+                <div class="tab-pane fade" id="register-recruiter" role="tabpanel" aria-labelledby="register-recruiter-tab">
+                    <form id="recruiterRegisterForm" method="post">
+                        <div class="mb-3">
+                            <label for="recruiter_hoTen" class="form-label">Họ tên người liên hệ</label>
+                            <input type="text" class="form-control" id="recruiter_hoTen" name="hoTen" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="recruiter_email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_sdt" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="recruiter_sdt" name="sdt" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_tenCongTy" class="form-label">Tên công ty</label>
+                            <input type="text" class="form-control" id="recruiter_tenCongTy" name="tenCongTy" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_tenDN" class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="recruiter_tenDN" name="tenDN" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_matKhau" class="form-label">Mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="recruiter_matKhau" name="matKhau" minlength="6" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#recruiter_matKhau">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">Mật khẩu phải có ít nhất 6 ký tự</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_xacNhanMatKhau" class="form-label">Xác nhận mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="recruiter_xacNhanMatKhau" name="xacNhanMatKhau" minlength="6" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#recruiter_xacNhanMatKhau">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="recruiter_dieuKhoan" name="dieuKhoan" required>
+                            <label class="form-check-label" for="recruiter_dieuKhoan">
+                                Tôi đồng ý với <a href="#" target="_blank">Điều khoản sử dụng</a> và <a href="#" target="_blank">Chính sách bảo mật</a>
+                            </label>
+                        </div>
+                        
+                        <input type="hidden" name="vaiTro" value="NhaTuyenDung">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Đăng Ký</button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <p>Đã có tài khoản? <a href="/nha-tuyen-dung/dang-nhap">Đăng nhập ngay</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('title') %>
+Đăng ký | Hệ thống tuyển dụng
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        // Xử lý toggle password
+        $('.toggle-password').on('click', function() {
+            const targetId = $(this).data('target');
+            const passwordInput = $(targetId);
+            const icon = $(this).find('i');
+            
+            if (passwordInput.attr('type') === 'password') {
+                passwordInput.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordInput.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        
+        // Kiểm tra mật khẩu khớp nhau cho ứng viên
+        function validateCandidatePassword() {
+            const password = $('#candidate_matKhau').val();
+            const confirm = $('#candidate_xacNhanMatKhau').val();
+            
+            if (password && confirm && password !== confirm) {
+                $('#candidate_xacNhanMatKhau').addClass('is-invalid');
+                return false;
+            } else {
+                $('#candidate_xacNhanMatKhau').removeClass('is-invalid');
+                return true;
+            }
+        }
+        
+        // Kiểm tra mật khẩu khớp nhau cho nhà tuyển dụng
+        function validateRecruiterPassword() {
+            const password = $('#recruiter_matKhau').val();
+            const confirm = $('#recruiter_xacNhanMatKhau').val();
+            
+            if (password && confirm && password !== confirm) {
+                $('#recruiter_xacNhanMatKhau').addClass('is-invalid');
+                return false;
+            } else {
+                $('#recruiter_xacNhanMatKhau').removeClass('is-invalid');
+                return true;
+            }
+        }
+        
+        // Kiểm tra mật khẩu khi nhập
+        $('#candidate_matKhau, #candidate_xacNhanMatKhau').on('input', validateCandidatePassword);
+        $('#recruiter_matKhau, #recruiter_xacNhanMatKhau').on('input', validateRecruiterPassword);
+        
+        // Xử lý đăng ký ứng viên
+        $('#candidateRegisterForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateCandidatePassword()) {
+                displayResult('Mật khẩu xác nhận không khớp với mật khẩu.', 'danger');
+                return false;
+            }
+            
+            const formData = {
+                hoTen: $('#candidate_hoTen').val(),
+                email: $('#candidate_email').val(),
+                sdt: $('#candidate_sdt').val(),
+                tenDN: $('#candidate_tenDN').val(),
+                matKhau: $('#candidate_matKhau').val(),
+                vaiTro: 'UngVien'
+            };
+            
+            // Hiển thị loading
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalText = submitBtn.text();
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Đang xử lý...');
+            
+            // Gửi request
+            $.ajax({
+                url: '/api/tai-khoan/dang-ky',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        displayResult('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/ung-vien/dang-nhap';
+                        }, 2000);
+                    } else {
+                        displayResult(response.message || 'Đăng ký thất bại.', 'danger');
+                        submitBtn.prop('disabled', false).text(originalText);
+                    }
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Đã xảy ra lỗi khi đăng ký.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    displayResult(errorMsg, 'danger');
+                    submitBtn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+        
+        // Xử lý đăng ký nhà tuyển dụng
+        $('#recruiterRegisterForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateRecruiterPassword()) {
+                displayResult('Mật khẩu xác nhận không khớp với mật khẩu.', 'danger');
+                return false;
+            }
+            
+            const formData = {
+                hoTen: $('#recruiter_hoTen').val(),
+                email: $('#recruiter_email').val(),
+                sdt: $('#recruiter_sdt').val(),
+                tenDN: $('#recruiter_tenDN').val(),
+                matKhau: $('#recruiter_matKhau').val(),
+                vaiTro: 'NhaTuyenDung',
+                thongTin: {
+                    tenCongTy: $('#recruiter_tenCongTy').val()
+                }
+            };
+            
+            // Hiển thị loading
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalText = submitBtn.text();
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Đang xử lý...');
+            
+            // Gửi request
+            $.ajax({
+                url: '/api/tai-khoan/dang-ky',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        displayResult('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/nha-tuyen-dung/dang-nhap';
+                        }, 2000);
+                    } else {
+                        displayResult(response.message || 'Đăng ký thất bại.', 'danger');
+                        submitBtn.prop('disabled', false).text(originalText);
+                    }
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Đã xảy ra lỗi khi đăng ký.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    displayResult(errorMsg, 'danger');
+                    submitBtn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+        
+        // Hiển thị thông báo
+        function displayResult(message, type) {
+            $('#registerResult')
+                .removeClass('d-none alert-success alert-danger alert-warning')
+                .addClass('alert-' + type)
+                .html(message);
+        }
+    });
+</script>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .toggle-password {
+        cursor: pointer;
+    }
+    .nav-tabs .nav-link {
+        color: #444;
+    }
+    .nav-tabs .nav-link.active {
+        font-weight: bold;
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+    }
+</style>

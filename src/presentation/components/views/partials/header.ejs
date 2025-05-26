@@ -1,0 +1,17 @@
+<header class="bg-primary py-2 mb-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/" class="text-white h6 mb-0">HỆ THỐNG TUYỂN DỤNG</a>
+            <div>
+                <a href="/viec-lam" class="text-white me-3">Việc Làm</a>
+                <% if (locals.user) { %>
+                    <a href="/ho-so" class="text-white me-3"><%= locals.user.hoTen %></a>
+                    <a href="/dang-xuat" class="text-white">Đăng xuất</a>
+                <% } else { %>
+                    <a href="/dang-nhap" class="btn btn-outline-light btn-sm me-2">Đăng nhập</a>
+                    <a href="/dang-ky" class="btn btn-light btn-sm text-primary">Đăng ký</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</header>

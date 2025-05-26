@@ -1,0 +1,64 @@
+<div class="sidebar p-3">
+    <div class="sidebar-header mb-4">
+        <h5 class="font-weight-bold">Quản lý tuyển dụng</h5>
+    </div>
+    
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="/quan-ly-cong-viec">
+                <i class="fas fa-briefcase mr-2"></i> Danh sách công việc
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/dang-tuyen-dung">
+                <i class="fas fa-plus-circle mr-2"></i> Đăng tin tuyển dụng
+            </a>
+        </li>
+        <!-- Đã xóa mục Quản lý ứng viên tại đây -->
+        <li class="nav-item">
+            <a class="nav-link" href="/danh-sach-ung-vien">
+                <i class="fas fa-list-alt mr-2"></i> Danh sách ứng viên
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/bao-cao-khieu-nai">
+                <i class="fas fa-exclamation-circle mr-2"></i> Báo cáo khiếu nại
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/ho-so-nha-tuyen-dung">
+                <i class="fas fa-user mr-2"></i> Hồ sơ công ty
+            </a>
+        </li>
+    </ul>
+</div>
+
+<style>
+    .sidebar {
+        min-height: calc(100vh - 72px);
+    }
+    
+    .sidebar .nav-link {
+        color: #495057;
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+    }
+    
+    .sidebar .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #0056b3;
+    }
+    
+    .sidebar .nav-link.active {
+        background-color: #e9ecef;
+        color: #007bff;
+        font-weight: 500;
+    }
+    
+    @media (max-width: 767.98px) {
+        .sidebar {
+            min-height: auto;
+            margin-bottom: 1rem;
+        }
+    }
+</style> 

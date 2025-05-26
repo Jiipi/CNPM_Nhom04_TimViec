@@ -1,0 +1,332 @@
+<% contentFor('title') %>Chỉnh sửa việc làm
+
+<% contentFor('body') %>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 bg-light p-0">
+            <%- include('../partials/sidebar-nha-tuyen-dung') %>
+        </div>
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="bg-light-subtle p-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/quan-ly-cong-viec">Quản lý công việc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa việc làm</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="bg-white p-4 mb-4">
+                <div class="edit-header mb-4">
+                    <div class="d-flex align-items-center">
+                        <img src="<%= company?.logo || '/images/default-company-logo.png' %>" alt="<%= company?.tenCongTy || locals.user?.hoTen %>" class="mr-3" style="width: 60px; height: 60px; object-fit: contain;">
+                        <div>
+                            <h5 class="mb-1"><%= company?.tenCongTy || locals.user?.hoTen %></h5>
+                            <div class="text-muted"><i class="fas fa-map-marker-alt mr-1"></i> <%= company?.diaChi || job?.diaDiem || 'Không có thông tin' %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="editJobForm" action="/api/cong-viec/<%= job?._id %>" method="POST" class="job-edit-form">
+                    <input type="hidden" name="_method" value="PUT">
+                    
+                    <!-- Thông tin cơ bản -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Thông tin cơ bản</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="tenCV"><i class="fas fa-briefcase text-primary mr-2"></i>Vị trí tuyển dụng <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="tenCV" name="tenCV" value="<%= job?.tenCV || '' %>" placeholder="Nhập tên vị trí" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group mb-3">
+                                        <label for="soLuong"><i class="fas fa-users text-primary mr-2"></i>Số lượng <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="soLuong" name="soLuong" value="<%= job?.soLuong || 1 %>" min="1" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group mb-3">
+                                        <label for="hanNopHoSo"><i class="fas fa-calendar-alt text-primary mr-2"></i>Hạn nộp hồ sơ</label>
+                                        <input type="date" class="form-control" id="hanNopHoSo" name="hanNopHoSo" value="<%= job?.hanNopHoSo ? new Date(job.hanNopHoSo).toISOString().split('T')[0] : '' %>">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="diaDiem"><i class="fas fa-map-marker-alt text-primary mr-2"></i>Địa điểm làm việc <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="diaDiem" name="diaDiem" value="<%= job?.diaDiem || '' %>" placeholder="Nhập địa điểm" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="yeuCauKinhNghiem"><i class="fas fa-user-graduate text-primary mr-2"></i>Kinh nghiệm</label>
+                                        <input type="text" class="form-control" id="yeuCauKinhNghiem" name="yeuCauKinhNghiem" value="<%= job?.yeuCauKinhNghiem || '' %>" placeholder="Ví dụ: 1-2 năm">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="nganhNghe"><i class="fas fa-briefcase text-primary mr-2"></i>Ngành nghề <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="nganhNghe" name="nganhNghe" required>
+                                            <option value="">-- Chọn ngành nghề --</option>
+                                            <option value="it" <%= job?.nganhNghe === 'it' ? 'selected' : '' %>>IT / Công nghệ phần mềm</option>
+                                            <option value="marketing" <%= job?.nganhNghe === 'marketing' ? 'selected' : '' %>>Marketing / Truyền thông</option>
+                                            <option value="finance" <%= job?.nganhNghe === 'finance' ? 'selected' : '' %>>Tài chính / Kế toán</option>
+                                            <option value="hr" <%= job?.nganhNghe === 'hr' ? 'selected' : '' %>>Nhân sự</option>
+                                            <option value="sales" <%= job?.nganhNghe === 'sales' ? 'selected' : '' %>>Kinh doanh / Bán hàng</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="hinhThucLamViec"><i class="fas fa-laptop-house text-primary mr-2"></i>Hình thức làm việc</label>
+                                        <select class="form-control" id="hinhThucLamViec" name="hinhThucLamViec">
+                                            <option value="Remote" <%= job?.hinhThucLamViec === 'Remote' ? 'selected' : '' %>>Từ xa</option>
+                                            <option value="In office" <%= job?.hinhThucLamViec === 'In office' ? 'selected' : '' %>>Tại văn phòng</option>
+                                            <option value="Hybrid" <%= job?.hinhThucLamViec === 'Hybrid' ? 'selected' : '' %>>Kết hợp</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="hinhThuc"><i class="fas fa-clock text-primary mr-2"></i>Loại hình công việc <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="hinhThuc" name="hinhThuc" required>
+                                            <option value="">-- Chọn loại hình --</option>
+                                            <option value="Toàn thời gian" <%= job?.hinhThuc === 'Toàn thời gian' ? 'selected' : '' %>>Toàn thời gian</option>
+                                            <option value="Bán thời gian" <%= job?.hinhThuc === 'Bán thời gian' ? 'selected' : '' %>>Bán thời gian</option>
+                                            <option value="Freelance" <%= job?.hinhThuc === 'Freelance' ? 'selected' : '' %>>Freelance</option>
+                                            <option value="Thực tập" <%= job?.hinhThuc === 'Thực tập' ? 'selected' : '' %>>Thực tập</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="luong"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Mức lương <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="luong" name="luong" required>
+                                            <option value="">-- Chọn mức lương --</option>
+                                            <option value="Thương lượng" <%= job?.luong === 'Thương lượng' ? 'selected' : '' %>>Thương lượng</option>
+                                            <option value="5 - 7 triệu" <%= job?.luong === '5 - 7 triệu' ? 'selected' : '' %>>5 - 7 triệu</option>
+                                            <option value="7 - 10 triệu" <%= job?.luong === '7 - 10 triệu' ? 'selected' : '' %>>7 - 10 triệu</option>
+                                            <option value="10 - 15 triệu" <%= job?.luong === '10 - 15 triệu' ? 'selected' : '' %>>10 - 15 triệu</option>
+                                            <option value="15 - 20 triệu" <%= job?.luong === '15 - 20 triệu' ? 'selected' : '' %>>15 - 20 triệu</option>
+                                            <option value="20 - 30 triệu" <%= job?.luong === '20 - 30 triệu' ? 'selected' : '' %>>20 - 30 triệu</option>
+                                            <option value="Trên 30 triệu" <%= job?.luong === 'Trên 30 triệu' ? 'selected' : '' %>>Trên 30 triệu</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="trangThai"><i class="fas fa-toggle-on text-primary mr-2"></i>Trạng thái</label>
+                                        <div class="mt-2">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="trangThai" id="trangThaiDangTuyen" value="Đang tuyển" <%= !job?.trangThai || job?.trangThai === 'Đang tuyển' ? 'checked' : '' %>>
+                                                <label class="form-check-label" for="trangThaiDangTuyen">Đang tuyển</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="trangThai" id="trangThaiDaDong" value="Đã đóng" <%= job?.trangThai === 'Đã đóng' ? 'checked' : '' %>>
+                                                <label class="form-check-label" for="trangThaiDaDong">Đã đóng</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mô tả công việc -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Mô tả công việc</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <textarea class="form-control" id="moTa" name="moTa" rows="6" placeholder="Mô tả chi tiết về công việc, trách nhiệm và nhiệm vụ"><%= job?.moTa || '' %></textarea>
+                                <small class="text-muted">Mô tả rõ ràng về vị trí, trách nhiệm và nhiệm vụ của công việc.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yêu cầu -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Yêu cầu</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <textarea class="form-control" id="yeucau" name="yeucau" rows="6" placeholder="Các yêu cầu về kỹ năng, bằng cấp, kinh nghiệm"><%= job?.yeucau || '' %></textarea>
+                                <small class="text-muted">Liệt kê các yêu cầu về bằng cấp, kỹ năng, kinh nghiệm cần thiết cho vị trí này.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quyền lợi -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Quyền lợi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <textarea class="form-control" id="quyenLoi" name="quyenLoi" rows="6" placeholder="Quyền lợi, chế độ và cơ hội phát triển"><%= job?.quyenLoi || '' %></textarea>
+                                <small class="text-muted">Mô tả các quyền lợi, chế độ đãi ngộ và cơ hội phát triển dành cho ứng viên.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (typeof errorMessage !== 'undefined') { %>
+                        <div class="alert alert-danger mb-4" role="alert">
+                            <%= errorMessage %>
+                        </div>
+                    <% } %>
+
+                    <div class="d-flex justify-content-end mt-4 mb-3">
+                        <a href="/quan-ly-cong-viec" class="btn btn-light mr-2" style="min-width: 120px;">Hủy</a>
+                        <button type="submit" class="btn btn-primary" style="min-width: 120px;">Cập nhật</button>
+                    </div>
+        </form>
+    </div>
+</div>
+
+<% contentFor('extraCSS') %>
+<style>
+    .edit-header {
+        background-color: #f8f9fa;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    .edit-form {
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 25px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    .form-section {
+        margin-bottom: 25px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 5px;
+    }
+    .form-section-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    .field-icon {
+        width: 30px;
+        text-align: center;
+        color: #666;
+    }
+    .form-group label {
+        font-weight: 500;
+        color: #444;
+    }
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+</style>
+
+<% contentFor('extraJS') %>
+<script>
+$(document).ready(function() {
+    console.log('Form chỉnh sửa công việc đã sẵn sàng');
+    
+    // Hàm kiểm tra các trường bắt buộc
+    function validateForm() {
+        let valid = true;
+        const requiredFields = ['#tenCV', '#soLuong', '#diaDiem', '#nganhNghe', '#hinhThuc', '#luong'];
+        
+        requiredFields.forEach(selector => {
+            if (!$(selector).val()) {
+                $(selector).addClass('is-invalid');
+                valid = false;
+            } else {
+                $(selector).removeClass('is-invalid');
+            }
+        });
+        
+        return valid;
+    }
+    
+    // Cách 1: Dùng AJAX để gửi form
+    $('#editJobForm').submit(function(e) {
+        e.preventDefault(); // Ngăn chặn form submit mặc định
+        
+        // Kiểm tra các trường bắt buộc
+        if (!validateForm()) {
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+            return false;
+        }
+        
+        // Lấy URL và dữ liệu form
+        const url = $(this).attr('action');
+        const formData = $(this).serialize();
+        
+        console.log('Gửi dữ liệu đến:', url);
+        console.log('Dữ liệu form:', formData);
+        
+        // Gửi AJAX request với xác thực CSRF
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            xhrFields: {
+                withCredentials: true  // Gửi cookie kèm theo request
+            },
+            success: function(response) {
+                console.log('Phản hồi từ server:', response);
+                if (response.success) {
+                    alert('Cập nhật công việc thành công!');
+                    window.location.href = '/quan-ly-cong-viec';
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Lỗi AJAX:', status, error);
+                console.log('Response text:', xhr.responseText);
+                
+                if (xhr.status === 401 || xhr.status === 403) {
+                    alert('Phiên làm việc hết hạn. Vui lòng đăng nhập lại.');
+                    window.location.href = '/dang-nhap';
+                    return;
+                }
+                
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    alert('Lỗi: ' + (response.message || 'Không thể cập nhật công việc'));
+                } catch (e) {
+                    alert('Lỗi không xác định khi cập nhật công việc');
+                }
+            }
+        });
+    });
+    
+    // Cách 2: Thay đổi lại cách gửi form, sử dụng submit trực tiếp
+    // Bỏ comment phần này để dùng cách 1
+    /*
+    // Khi nhấn nút Cập nhật, kiểm tra dữ liệu và submit form trực tiếp
+    $('#btnSubmitForm').click(function() {
+        if (validateForm()) {
+            $('#editJobForm').unbind('submit').submit(); // Gỡ bỏ xử lý AJAX và submit trực tiếp
+        } else {
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+            return false;
+        }
+    });
+    */
+});
+</script>

@@ -1,0 +1,547 @@
+<%- contentFor('title') %><%= congViec ? `Danh sách ứng viên - ${congViec.tenCV}` : 'Danh sách ứng viên' %>
+
+<%- contentFor('body') %>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 bg-light p-0">
+            <%- include('../partials/sidebar-nha-tuyen-dung') %>
+        </div>
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="bg-light-subtle p-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/quan-ly-cong-viec">Quản lý công việc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Danh sách ứng viên</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="bg-white p-4 mb-4">
+                <!-- Thông tin công việc -->
+                <div class="bg-light-subtle p-3 mb-4 rounded">
+                    <% if (congViec) { %>
+                        <!-- Trường hợp xem ứng viên theo công việc cụ thể -->
+                        <h2 class="h4 mb-2">DANH SÁCH ỨNG VIÊN</h2>
+                        <div class="job-info">
+                            <div class="d-flex align-items-center">
+                                <div class="job-title flex-grow-1">
+                                    <p class="mb-0"><strong>Vị trí công việc:</strong> <%= congViec.tenCV %></p>
+                                    <p class="mb-0"><strong>Số ứng viên:</strong> <%= danhSachUngVien.length %> người</p>
+                                </div>
+                                <div>
+                                    <a href="/quan-ly-cong-viec" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <!-- Trường hợp xem tất cả ứng viên -->
+                        <h2 class="h4 mb-0">DANH SÁCH TẤT CẢ ỨNG VIÊN</h2>
+                    <% } %>
+                </div>
+                
+                <% if (!congViec) { %>
+                    <!-- Bộ lọc chỉ hiển thị khi xem tất cả ứng viên -->
+                    <div class="bg-light-subtle p-3 mb-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm ứng viên...">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" id="searchBtn">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-md-end">
+                                    <select class="form-control w-50" id="filterSelect">
+                                        <option value="all">Tất cả ứng viên</option>
+                                        <option value="new">Ứng viên mới</option>
+                                        <option value="applied">Đã ứng tuyển</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <% if (danhSachUngVien && danhSachUngVien.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">HỌ VÀ TÊN</th>
+                                    <th scope="col">EMAIL</th>
+                                    <% if (congViec) { %>
+                                        <th scope="col">KẾT QUẢ</th>
+                                        <th scope="col">GỬI THÔNG BÁO</th>
+                                    <% } else { %>
+                                        <th scope="col">SỐ ĐIỆN THOẠI</th>
+                                        <th scope="col">VỊ TRÍ ỨNG TUYỂN</th>
+                                        <th scope="col">TRẠNG THÁI</th>
+                                        <th scope="col">THAO TÁC</th>
+                                    <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% danhSachUngVien.forEach((ungVien, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td>
+                                            <a href="#" class="view-profile" data-id="<%= ungVien._id %>">
+                                                <%= ungVien.hoTen %>
+                                            </a>
+                                        </td>
+                                        <td><%= ungVien.email %></td>
+                                        <% if (congViec) { %>
+                                            <!-- Trường hợp xem theo công việc cụ thể -->
+                                            <td>
+                                                <span class="badge badge-<%= 
+                                                    ungVien.ketQua === 'Đạt' ? 'success' : 
+                                                    (ungVien.ketQua === 'Không đạt' ? 'danger' : 'warning') 
+                                                %>" id="badge-result-<%= ungVien._id %>">
+                                                    <%= ungVien.ketQua || 'Chưa có kết quả' %>
+                                                </span>
+                                                <div class="btn-group ml-2">
+                                                    <button class="btn btn-sm btn-success update-result" data-id="<%= ungVien._id %>" data-congviec="<%= congViec._id %>" data-result="Đạt" data-donid="<%= ungVien.donUngTuyenId || '' %>">
+                                                        <i class="fas fa-check"></i> Đạt
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger update-result" data-id="<%= ungVien._id %>" data-congviec="<%= congViec._id %>" data-result="Không đạt" data-donid="<%= ungVien.donUngTuyenId || '' %>">
+                                                        <i class="fas fa-times"></i> Rớt
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="/gui-thong-bao/<%= ungVien._id %>?congViecId=<%= congViec._id %>" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </a>
+                                                    <button class="btn btn-danger btn-sm delete-application" data-id="<%= ungVien.donUngTuyenId %>" data-name="<%= ungVien.hoTen %>">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        <% } else { %>
+                                            <!-- Trường hợp xem tất cả ứng viên -->
+                                            <td><%= ungVien.sdt %></td>
+                                            <td><%= ungVien.viTriUngTuyen || 'Chưa xác định' %></td>
+                                            <td>
+                                                <span class="badge badge-<%= ungVien.trangThai === 'Đã duyệt' ? 'success' : (ungVien.trangThai === 'Đã từ chối' ? 'danger' : 'warning') %>">
+                                                    <%= ungVien.trangThai || 'Đang chờ' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="/xem-cv/<%= ungVien._id %>" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/gui-thong-bao/<%= ungVien._id %>" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        <% } %>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="alert alert-info">
+                        <% if (congViec) { %>
+                            <p class="mb-0">Chưa có ứng viên nào ứng tuyển cho công việc này.</p>
+                        <% } else { %>
+                            <p class="mb-0">Chưa có ứng viên nào trong danh sách.</p>
+                        <% } %>
+                    </div>
+                <% } %>
+                
+                <!-- Phân trang - chỉ hiển thị khi xem tất cả ứng viên và có nhiều hơn 1 trang -->
+                <% if (!congViec && typeof totalPages !== 'undefined' && totalPages > 1) { %>
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="/danh-sach-ung-vien?page=<%= currentPage - 1 %>" tabindex="-1">Trước</a>
+                            </li>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                    <a class="page-link" href="/danh-sach-ung-vien?page=<%= i %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="/danh-sach-ung-vien?page=<%= currentPage + 1 %>">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xem hồ sơ chi tiết -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel">Hồ sơ ứng viên</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="profileContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Đang tải...</span>
+                    </div>
+                    <p class="mt-2">Đang tải thông tin ứng viên...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <a href="#" id="downloadCvBtn" class="btn btn-primary">Tải CV</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal gửi thông báo - Chỉ hiển thị khi xem theo công việc cụ thể -->
+<% if (congViec) { %>
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel">Gửi thông báo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="notificationForm">
+                        <input type="hidden" id="ungVienId" name="ungVienId">
+                        <div class="form-group">
+                            <label for="tieuDe">Tiêu đề</label>
+                            <input type="text" class="form-control" id="tieuDe" name="tieuDe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="noiDung">Nội dung</label>
+                            <textarea class="form-control" id="noiDung" name="noiDung" rows="5" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="ketQua">Kết quả</label>
+                            <select class="form-control" id="ketQua" name="ketQua" required>
+                                <option value="Đạt">Đạt</option>
+                                <option value="Không đạt">Không đạt</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="sendNotificationBtn">Gửi thông báo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<%- contentFor('extraJS') %>
+<!-- Common JavaScript for all cases -->
+<script>
+$(document).ready(function() {
+    // Xử lý xem hồ sơ chi tiết
+    $('.view-profile').click(function(e) {
+        e.preventDefault();
+        const ungVienId = $(this).data('id');
+        
+        // Hiển thị modal với trạng thái đang tải
+        $('#profileModal').modal('show');
+        
+        // Gọi API lấy thông tin chi tiết ứng viên
+        $.ajax({
+            url: `/api/ung-vien/${ungVienId}`,
+            method: 'GET',
+            success: function(response) {
+                // Hiển thị thông tin chi tiết ứng viên
+                let profileHtml = `
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <img src="${response.anhDaiDien || '/public/images/default-avatar.jpg'}" alt="${response.hoTen}" class="img-fluid rounded-circle" style="max-width: 150px;">
+                        </div>
+                        <div class="col-md-8">
+                            <h4>${response.hoTen}</h4>
+                            <p><strong>Email:</strong> ${response.email}</p>
+                            <p><strong>Số điện thoại:</strong> ${response.sdt || 'Chưa cập nhật'}</p>
+                            <p><strong>Địa chỉ:</strong> ${response.diaChi || 'Chưa cập nhật'}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Kỹ năng</h5>
+                            <div class="mb-3">
+                                ${response.kyNang && response.kyNang.length > 0 ? 
+                                    response.kyNang.map(skill => `<span class="badge badge-info mr-2 mb-2 p-2">${skill}</span>`).join('') : 
+                                    '<p class="text-muted">Chưa cập nhật kỹ năng</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                $('#profileContent').html(profileHtml);
+                
+                // Cập nhật đường dẫn tải CV
+                if (response.cv) {
+                    $('#downloadCvBtn').attr('href', response.cv).removeClass('d-none');
+                } else {
+                    $('#downloadCvBtn').addClass('d-none');
+                }
+            },
+            error: function(error) {
+                console.error('Lỗi khi tải thông tin ứng viên:', error);
+                $('#profileContent').html(`
+                    <div class="alert alert-danger">
+                        Đã xảy ra lỗi khi tải thông tin ứng viên. Vui lòng thử lại sau.
+                    </div>
+                `);
+            }
+        });
+    });
+});
+</script>
+
+<!-- Conditional JavaScript specific to job view -->
+<% if (congViec) { %>
+<script>
+$(document).ready(function() {
+    // Các xử lý chỉ áp dụng khi xem theo công việc cụ thể
+    
+    // Xử lý mở modal gửi thông báo
+    $('.send-notification').click(function() {
+        const ungVienId = $(this).data('id');
+        $('#ungVienId').val(ungVienId);
+        $('#notificationModal').modal('show');
+    });
+    
+    // Xử lý gửi thông báo
+    $('#sendNotificationBtn').click(function() {
+        const ungVienId = $('#ungVienId').val();
+        const tieuDe = $('#tieuDe').val();
+        const noiDung = $('#noiDung').val();
+        const ketQua = $('#ketQua').val();
+        
+        if (!tieuDe || !noiDung) {
+            alert('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+        
+        const congViecId = '<%= congViec._id %>';
+        
+        $.ajax({
+            url: '/api/thong-bao/ung-vien',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                ungVienId,
+                congViecId,
+                tieuDe,
+                noiDung,
+                ketQua
+            }),
+            success: function(response) {
+                $('#notificationModal').modal('hide');
+                alert('Gửi thông báo thành công!');
+                
+                // Cập nhật trạng thái kết quả trên giao diện
+                const badgeClass = ketQua === 'Đạt' ? 'badge-success' : 'badge-danger';
+                $(`button[data-id="${ungVienId}"]`).closest('tr').find('td:nth-child(4) span')
+                    .removeClass('badge-success badge-danger badge-warning')
+                    .addClass(badgeClass)
+                    .text(ketQua);
+                
+                // Reset form
+                $('#notificationForm')[0].reset();
+            },
+            error: function(error) {
+                console.error('Lỗi khi gửi thông báo:', error);
+                alert('Đã xảy ra lỗi khi gửi thông báo. Vui lòng thử lại sau.');
+            }
+        });
+    });
+    
+    // Xử lý nút cập nhật kết quả nhanh (Đạt/Rớt)
+    $('.update-result').click(function() {
+        const button = $(this);
+        const ungVienId = button.data('id');
+        const congViecId = button.data('congviec');
+        const ketQua = button.data('result');
+        const donUngTuyenId = button.data('donid');
+        
+        // Hiển thị spinner trong nút để báo đang xử lý
+        const originalContent = button.html();
+        button.html('<i class="fas fa-spinner fa-spin"></i> Đang xử lý...');
+        button.prop('disabled', true);
+        // Disable nút bên cạnh để tránh nhấn cùng lúc
+        button.siblings('.update-result').prop('disabled', true);
+        
+        // Mặc định tiêu đề và nội dung dựa trên kết quả
+        const tieuDe = ketQua === 'Đạt' 
+            ? 'Thông báo kết quả ứng tuyển - Đạt' 
+            : 'Thông báo kết quả ứng tuyển - Không đạt';
+        
+        const noiDung = ketQua === 'Đạt' 
+            ? `Chúc mừng! Hồ sơ ứng tuyển của bạn cho vị trí "${$('.job-title p:first-child strong').next().text().trim()}" đã được chấp nhận. Chúng tôi sẽ liên hệ với bạn để trao đổi thêm về các bước tiếp theo.` 
+            : `Rất tiếc! Hồ sơ ứng tuyển của bạn cho vị trí "${$('.job-title p:first-child strong').next().text().trim()}" chưa phù hợp với yêu cầu hiện tại của chúng tôi. Cảm ơn bạn đã quan tâm đến công ty.`;
+        
+        if (confirm(`Bạn có chắc muốn cập nhật kết quả ứng viên này thành "${ketQua}"?`)) {
+            $.ajax({
+                url: '/api/thong-bao/ung-vien',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    ungVienId,
+                    congViecId,
+                    tieuDe,
+                    noiDung,
+                    ketQua,
+                    donUngTuyenId // Thêm ID đơn ứng tuyển để cập nhật trực tiếp
+                }),
+                success: function(response) {
+                    // Phục hồi nút và cập nhật giao diện
+                    button.html(originalContent);
+                    button.prop('disabled', false);
+                    button.siblings('.update-result').prop('disabled', false);
+                    
+                    // Hiển thị thông báo thành công
+                    alert('Cập nhật kết quả thành công!');
+                    
+                    // Cập nhật trạng thái kết quả trên giao diện - Tìm chính xác badge theo ID
+                    const badgeClass = ketQua === 'Đạt' ? 'badge-success' : 'badge-danger';
+                    const $badge = $(`#badge-result-${ungVienId}`);
+                    $badge
+                        .removeClass('badge-success badge-danger badge-warning')
+                        .addClass(badgeClass)
+                        .text(ketQua);
+                        
+                    // Cập nhật đơn ứng tuyển trực tiếp bằng AJAX
+                    if (donUngTuyenId) {
+                        $.ajax({
+                            url: `/api/don-ung-tuyen/cap-nhat-ket-qua/${donUngTuyenId}`,
+                            method: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                ketQua: ketQua,
+                                trangThai: ketQua === 'Đạt' ? 'Trúng tuyển' : 'Từ chối'
+                            }),
+                            error: function(error) {
+                                console.error('Lỗi khi cập nhật trạng thái đơn ứng tuyển:', error);
+                            }
+                        });
+                    }
+                },
+                error: function(error) {
+                    // Phục hồi nút khi có lỗi
+                    button.html(originalContent);
+                    button.prop('disabled', false);
+                    button.siblings('.update-result').prop('disabled', false);
+                    
+                    console.error('Lỗi khi cập nhật kết quả:', error);
+                    alert('Đã xảy ra lỗi khi cập nhật kết quả. Vui lòng thử lại sau.');
+                }
+            });
+        } else {
+            // Phục hồi nút nếu người dùng hủy thao tác
+            button.html(originalContent);
+            button.prop('disabled', false);
+            button.siblings('.update-result').prop('disabled', false);
+        }
+    });
+    
+    // Xử lý xóa đơn ứng tuyển
+    $('.delete-application').click(function() {
+        const donUngTuyenId = $(this).data('id');
+        const ungVienName = $(this).data('name');
+        
+        if (confirm(`Bạn có chắc chắn muốn xóa đơn ứng tuyển của ${ungVienName}?`)) {
+            $.ajax({
+                url: `/api/don-ung-tuyen/${donUngTuyenId}`,
+                method: 'DELETE',
+                success: function(response) {
+                    alert('Xóa đơn ứng tuyển thành công!');
+                    // Xóa dòng khỏi bảng
+                    $(`.delete-application[data-id="${donUngTuyenId}"]`).closest('tr').fadeOut(500, function() {
+                        $(this).remove();
+                        
+                        // Cập nhật số lượng ứng viên hiển thị
+                        const currentCount = parseInt($('.job-info p:contains("Số ứng viên")').text().match(/\d+/)[0]) - 1;
+                        $('.job-info p:contains("Số ứng viên")').html(`<strong>Số ứng viên:</strong> ${currentCount} người`);
+                        
+                        // Kiểm tra nếu không còn ứng viên nào
+                        if ($('table tbody tr').length === 0) {
+                            $('table').replaceWith(`
+                                <div class="alert alert-info">
+                                    <p class="mb-0">Chưa có ứng viên nào ứng tuyển cho công việc này.</p>
+                                </div>
+                            `);
+                        }
+                    });
+                },
+                error: function(error) {
+                    console.error('Lỗi khi xóa đơn ứng tuyển:', error);
+                    alert('Đã xảy ra lỗi khi xóa đơn ứng tuyển. Vui lòng thử lại sau.');
+                }
+            });
+        }
+    });
+});
+</script>
+<% } else { %>
+<!-- JavaScript for candidate list view -->
+<script>
+$(document).ready(function() {
+    // Các xử lý chỉ áp dụng khi xem tất cả ứng viên
+    
+    // Xử lý tìm kiếm
+    $('#searchBtn').click(function() {
+        const searchValue = $('#searchInput').val().trim();
+        if (searchValue) {
+            window.location.href = `/danh-sach-ung-vien?search=${encodeURIComponent(searchValue)}`;
+        }
+    });
+    
+    // Xử lý tìm kiếm khi nhấn Enter
+    $('#searchInput').keypress(function(e) {
+        if (e.which === 13) {
+            $('#searchBtn').click();
+        }
+    });
+    
+    // Xử lý bộ lọc
+    $('#filterSelect').change(function() {
+        const filterValue = $(this).val();
+        window.location.href = `/danh-sach-ung-vien?filter=${filterValue}`;
+    });
+});
+</script>
+<% } %>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    
+    .view-profile {
+        color: #007bff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    
+    .badge {
+        font-size: 85%;
+    }
+</style> 

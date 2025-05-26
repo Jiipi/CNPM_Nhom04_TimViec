@@ -1,0 +1,173 @@
+<%- contentFor('body') %>
+<div class="container mt-4">
+    <div class="admin-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/quan-ly-viec-lam">Quản lý công việc</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Danh sách công việc phê duyệt</li>
+            </ol>
+        </nav>
+        <h2 class="admin-title">Danh sách công việc cần phê duyệt</h2>
+    </div>
+
+    <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= successMessage %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                
+            </button>
+        </div>
+    <% } %>
+
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= errorMessage %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                
+            </button>
+        </div>
+    <% } %>
+
+    <div class="job-list">
+        <% if (jobs && jobs.length > 0) { %>
+            <% jobs.forEach(job => { %>
+                <div class="job-item">
+                    <div class="d-flex">
+                        <div class="me-1">
+                            <img src="/images/kg_logo.jpg" alt="K&G Technology Company Limited" class="company-logo">
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="job-company">K&G Technology Company Limited</div>
+                            <div class="job-title"><%= job.tenCV %></div>
+                            <div class="job-meta">
+                                <span class="me-1"><i class="fas fa-money-bill-wave text-success me-1"></i> <%= job.luong %></span>
+                                <span><i class="fas fa-map-marker-alt text-danger me-1"></i> <%= job.diaDiem %></span>
+                            </div>
+                        </div>
+                        <div class="ms-auto">
+                            <form action="/api/phe-duyet-viec-lam" method="POST" class="d-inline">
+                                <input type="hidden" name="congViecId" value="<%= job._id %>">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn btn-sm btn-success">Duyệt</button>
+                            </form>
+                            <form action="/api/phe-duyet-viec-lam" method="POST" class="d-inline ml-2">
+                                <input type="hidden" name="congViecId" value="<%= job._id %>">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn btn-sm btn-danger">Từ chối</button>
+                            </form>
+                            <a href="/chi-tiet-viec-lam/<%= job._id %>" class="btn btn-sm btn-info ml-2">Xem</a>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle mr-2"></i> Không có công việc nào cần phê duyệt.
+            </div>
+        <% } %>
+    </div>
+
+    <% if (jobs && jobs.length > 0 && totalPages > 1) { %>
+        <div class="pagination justify-content-center mt-4">
+            <ul class="pagination">
+                <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/phe-duyet-viec-lam?page=<%= currentPage - 1 %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                <% } %>
+                
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="/phe-duyet-viec-lam?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/phe-duyet-viec-lam?page=<%= currentPage + 1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    <% } %>
+</div>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .admin-header {
+        margin-bottom: 20px;
+    }
+    .admin-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    .job-item {
+        border: 1px solid #eee;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    .job-item:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .company-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        background-color: #f8f9fa;
+        padding: 5px;
+        border-radius: 5px;
+    }
+    .job-company {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    .job-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .job-meta {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    .breadcrumb {
+        background-color: transparent;
+        padding-left: 0;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+    }
+</style>
+
+<%- contentFor('extraJS') %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Xác nhận trước khi từ chối việc làm
+    document.querySelectorAll('form [name="action"][value="reject"]').forEach(function(rejectBtn) {
+        rejectBtn.closest('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (confirm('Bạn có chắc chắn muốn từ chối việc làm này không?')) {
+                this.submit();
+            }
+        });
+    });
+    
+    // Tự động đóng thông báo sau 3 giây
+    setTimeout(function() {
+        document.querySelectorAll('.alert-success, .alert-danger').forEach(function(alert) {
+            if (alert && typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        });
+    }, 3000);
+});
+</script>

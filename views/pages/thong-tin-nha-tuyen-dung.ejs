@@ -1,0 +1,108 @@
+<%- contentFor('body') %>
+<section class="recruiter-profile-section py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card recruiter-info mb-4">
+                    <div class="card-body text-center">
+                        <img src="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.logo ? nhaTuyenDung.thongTin.logo : 'https://via.placeholder.com/150' %>" 
+                             alt="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.tenCongTy ? nhaTuyenDung.thongTin.tenCongTy : nhaTuyenDung.hoTen %>" 
+                             class="img-fluid company-logo mb-3" 
+                             style="max-width: 150px; max-height: 150px;">
+                        <h3 class="card-title text-warning"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.tenCongTy ? nhaTuyenDung.thongTin.tenCongTy : nhaTuyenDung.hoTen %></h3>
+                        <% if (nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.diaChi) { %>
+                            <p class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i> <%= nhaTuyenDung.thongTin.diaChi %></p>
+                        <% } %>
+                        <p class="mb-2"><i class="fas fa-envelope mr-2"></i> <%= nhaTuyenDung.email %></p>
+                        <% if (nhaTuyenDung.sdt) { %>
+                            <p class="mb-2"><i class="fas fa-phone mr-2"></i> <%= nhaTuyenDung.sdt %></p>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="card recruiter-details mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Giới thiệu công ty</h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.moTa) { %>
+                            <p><%= nhaTuyenDung.thongTin.moTa %></p>
+                        <% } else { %>
+                            <p>Chưa có thông tin giới thiệu.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <div class="recruiter-jobs">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Danh sách việc làm đang tuyển</h4>
+                            <span class="badge badge-primary"><%= congViec.length %> việc làm</span>
+                        </div>
+                        <div class="card-body">
+                            <% if (congViec && congViec.length > 0) { %>
+                                <% congViec.forEach(job => { %>
+                                    <div class="job-item border-bottom pb-3 mb-3">
+                                        <h5 class="job-title"><a href="/chi-tiet-viec-lam/<%= job._id %>" class="text-dark"><%= job.tenCV %></a></h5>
+                                        <div class="job-meta d-flex flex-wrap">
+                                            <span class="mr-3"><i class="fas fa-money-bill-wave mr-1"></i> <%= job.luong ? job.luong.toLocaleString('vi-VN') : '0' %> VNĐ</span>
+                                            <span class="mr-3"><i class="fas fa-map-marker-alt mr-1"></i> <%= job.diaDiem || 'Chưa cập nhật' %></span>
+                                            <span><i class="far fa-clock mr-1"></i> <%= new Date(job.ngayDang).toLocaleDateString('vi-VN') %></span>
+                                        </div>
+                                        <div class="job-excerpt mt-2">
+                                            <p><%= job.moTa ? (job.moTa.length > 150 ? job.moTa.substring(0, 150) + '...' : job.moTa) : 'Không có mô tả' %></p>
+                                        </div>
+                                        <% if (job.kyNang && job.kyNang.length > 0) { %>
+                                            <div class="job-tags">
+                                                <% job.kyNang.slice(0, 3).forEach(skill => { %>
+                                                    <span class="badge badge-light mr-2"><%= skill %></span>
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-4">
+                                    <p class="mb-0">Hiện tại nhà tuyển dụng chưa có tin tuyển dụng nào.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .company-logo {
+        border: 1px solid #eee;
+        padding: 5px;
+        background-color: #fff;
+    }
+    
+    .recruiter-info, .recruiter-details, .recruiter-jobs .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .job-item:last-child {
+        border-bottom: none !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    .text-warning {
+        color: #fd7e14 !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 5px 10px;
+    }
+</style>
+
+<%- contentFor('extraJS') %> 

@@ -1,0 +1,345 @@
+<%- contentFor('body') %>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="modal-content p-0" style="max-width: 450px; width: 100%; margin: 40px auto;">
+        <div class="modal-header border-0 pb-0 d-flex justify-content-end">
+            <a href="/" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body px-4 pt-0 pb-4">
+            <div class="text-center mb-4">
+                <img src="/images/logo.jpg" alt="MY JOB Logo" class="logo mb-2" style="max-width: 120px;">
+                <% if (typeof userType !== 'undefined') { %>
+                    <% if (userType === 'ungVien') { %>
+                        <h4 class="font-weight-bold">Đăng Nhập Ứng Viên</h4>
+                        <p class="text-muted">Đăng nhập để tìm kiếm việc làm phù hợp với bạn</p>
+                    <% } else if (userType === 'nhaTuyenDung') { %>
+                        <h4 class="font-weight-bold">Đăng Nhập Nhà Tuyển Dụng</h4>
+                        <p class="text-muted">Đăng nhập để quản lý và đăng tin tuyển dụng</p>
+                    <% } else { %>
+                        <h4 class="font-weight-bold">Đăng ký/ Đăng nhập</h4>
+                        <p class="text-muted">Liên kết tài khoản của bạn để tiếp tục sử dụng dịch vụ</p>
+                    <% } %>
+                <% } else { %>
+                    <h4 class="font-weight-bold">Đăng ký/ Đăng nhập</h4>
+                    <p class="text-muted">Liên kết tài khoản của bạn để tiếp tục sử dụng dịch vụ</p>
+                <% } %>
+            </div>
+            
+            <% if (typeof userType === 'undefined' || userType === 'common') { %>
+            <!-- Hiển thị tabs chỉ khi không có userType hoặc userType là common -->
+            <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="login-candidate-tab" data-bs-toggle="tab" data-bs-target="#login-candidate" type="button" role="tab" aria-controls="login-candidate" aria-selected="true">Ứng viên</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="login-recruiter-tab" data-bs-toggle="tab" data-bs-target="#login-recruiter" type="button" role="tab" aria-controls="login-recruiter" aria-selected="false">Nhà tuyển dụng</button>
+                </li>
+            </ul>
+            <% } %>
+            
+            <!-- Thông báo lỗi -->
+            <div id="loginError" class="alert alert-danger d-none"></div>
+            
+            <!-- Thông báo lỗi cho nhà tuyển dụng -->
+            <div class="alert alert-danger d-none" id="recruiterError"></div>
+            
+            <!-- Chúng ta không còn sử dụng thông báo này nữa -->
+            <div class="alert alert-warning d-none" id="wrongTabError" style="display:none !important;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Sai vai trò đăng nhập!</strong> 
+                <span id="switchTabMessage"></span>
+            </div>
+            
+            <div class="tab-content" id="loginTabContent">
+                <% if (typeof userType === 'undefined' || userType === 'common' || userType === 'ungVien') { %>
+                <!-- Tab Ứng viên -->
+                <div class="tab-pane fade <%= (typeof userType === 'undefined' || userType === 'common' || userType === 'ungVien') ? 'show active' : '' %>" id="login-candidate" role="tabpanel" aria-labelledby="login-candidate-tab">
+                    <form id="candidateLoginForm" method="post" action="/api/tai-khoan/dang-nhap">
+                        <div class="mb-3">
+                            <label for="candidate_tenDN" class="form-label">Tên đăng nhập hoặc Email</label>
+                            <input type="text" class="form-control" id="candidate_tenDN" name="tenDN" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="candidate_matKhau" class="form-label">Mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="candidate_matKhau" name="matKhau" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#candidate_matKhau">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="candidate_rememberMe" name="rememberMe">
+                            <label class="form-check-label" for="candidate_rememberMe">Nhớ đăng nhập</label>
+                        </div>
+                        
+                        <!-- Trường ẩn vai trò -->
+                        <input type="hidden" name="vaiTro" value="UngVien">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+                        </div>
+                        
+                        <div class="text-end mt-2">
+                            <a href="/quen-mat-khau" class="small">Quên mật khẩu?</a>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <p>Chưa có tài khoản? <a href="/ung-vien/dang-ky">Đăng ký ngay</a></p>
+                            <a href="/" class="text-muted small"><i class="fas fa-arrow-left mr-1"></i> Quay về trang chủ</a>
+                        </div>
+                    </form>
+                </div>
+                <% } %>
+                
+                <% if (typeof userType === 'undefined' || userType === 'common' || userType === 'nhaTuyenDung') { %>
+                <!-- Tab Nhà tuyển dụng -->
+                <div class="tab-pane fade <%= (userType === 'nhaTuyenDung') ? 'show active' : '' %>" id="login-recruiter" role="tabpanel" aria-labelledby="login-recruiter-tab">
+                    <form id="recruiterLoginForm" method="post" action="/api/tai-khoan/dang-nhap">
+                        <div class="mb-3">
+                            <label for="recruiter_tenDN" class="form-label">Tên đăng nhập hoặc Email</label>
+                            <input type="text" class="form-control" id="recruiter_tenDN" name="tenDN" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="recruiter_matKhau" class="form-label">Mật khẩu</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="recruiter_matKhau" name="matKhau" required>
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#recruiter_matKhau">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="recruiter_rememberMe" name="rememberMe">
+                            <label class="form-check-label" for="recruiter_rememberMe">Nhớ đăng nhập</label>
+                        </div>
+                        
+                        <!-- Trường ẩn vai trò -->
+                        <input type="hidden" name="vaiTro" value="NhaTuyenDung">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+                        </div>
+                        
+                        <div class="text-end mt-2">
+                            <a href="/quen-mat-khau" class="small">Quên mật khẩu?</a>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <p>Chưa có tài khoản? <a href="/nha-tuyen-dung/dang-ky">Đăng ký ngay</a></p>
+                            <a href="/" class="text-muted small"><i class="fas fa-arrow-left mr-1"></i> Quay về trang chủ</a>
+                        </div>
+                    </form>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('title') %>
+<% if (typeof userType !== 'undefined') { %>
+    <% if (userType === 'ungVien') { %>
+        Đăng nhập ứng viên | Hệ thống tuyển dụng
+    <% } else if (userType === 'nhaTuyenDung') { %>
+        Đăng nhập nhà tuyển dụng | Hệ thống tuyển dụng
+    <% } else { %>
+        Đăng nhập | Hệ thống tuyển dụng
+    <% } %>
+<% } else { %>
+    Đăng nhập | Hệ thống tuyển dụng
+<% } %>
+
+<%- contentFor('extraJS') %>
+<script>
+  $(document).ready(function() {
+    console.log('Trang đăng nhập đã sẵn sàng!');
+    
+    // Kiểm tra và hiển thị lỗi từ localStorage nếu có
+    const userType = '<%= userType %>';
+    
+    // Hiển thị lỗi từ localStorage nếu có
+    if (userType === 'ungvien' || userType === undefined || userType === 'common') {
+      const ungvienError = localStorage.getItem('ungvien_login_error');
+      if (ungvienError) {
+        $('#loginError').text(ungvienError).removeClass('d-none');
+        // Xóa lỗi sau khi đã hiển thị
+        localStorage.removeItem('ungvien_login_error');
+      }
+    }
+    
+    if (userType === 'nhatuyendung' || userType === undefined || userType === 'common') {
+      const nhatuyendungError = localStorage.getItem('nhatuyendung_login_error');
+      if (nhatuyendungError) {
+        $('#recruiterError').text(nhatuyendungError).removeClass('d-none');
+        // Xóa lỗi sau khi đã hiển thị
+        localStorage.removeItem('nhatuyendung_login_error');
+      }
+    }
+    
+    // Debug thông tin tabs
+    console.log('Trạng thái tabs:', {
+      candidateTab: document.getElementById('login-candidate-tab'),
+      recruiterTab: document.getElementById('login-recruiter-tab'),
+      candidatePane: document.getElementById('login-candidate'),
+      recruiterPane: document.getElementById('login-recruiter')
+    });
+    
+    // Theo dõi tab hiện tại
+    let currentTab = '<%= userType === "nhaTuyenDung" ? "login-recruiter" : "login-candidate" %>';
+    
+    // Xử lý sự kiện chuyển tab
+    $('#login-candidate-tab').on('shown.bs.tab', function() {
+      currentTab = 'login-candidate';
+      console.log('Đã chuyển sang tab Ứng viên');
+      $('#recruiterError').addClass('d-none');
+      $('#loginError').addClass('d-none');
+    });
+    
+    $('#login-recruiter-tab').on('shown.bs.tab', function() {
+      currentTab = 'login-recruiter';
+      console.log('Đã chuyển sang tab Nhà tuyển dụng');
+      $('#recruiterError').addClass('d-none');
+      $('#loginError').addClass('d-none');
+    });
+    
+    // Định nghĩa hàm xử lý đăng nhập
+    function handleLogin(role, formData) {
+      console.log(`Xử lý đăng nhập ${role} với dữ liệu:`, formData);
+      
+      const errorSelector = role === 'NhaTuyenDung' ? '#recruiterError' : '#loginError';
+      $(errorSelector).addClass('d-none');
+      
+      // Xóa bất kỳ thông báo lỗi cũ nào có thể còn trong localStorage
+      // Sử dụng localStorage thay vì session để lưu thông báo lỗi cho tab/trang hiện tại
+      const errorKey = role === 'NhaTuyenDung' ? 'nhatuyendung_login_error' : 'ungvien_login_error';
+      localStorage.removeItem(errorKey);
+      
+      // Xác định URL API đăng nhập dựa vào vai trò
+      let loginUrl = '/api/tai-khoan/dang-nhap';
+      if (role === 'UngVien') {
+        loginUrl = '/ung-vien/api/dang-nhap';
+      } else if (role === 'NhaTuyenDung') {
+        loginUrl = '/nha-tuyen-dung/api/dang-nhap';
+      }
+      
+      $.ajax({
+        url: loginUrl,
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+          console.log(`Đăng nhập ${role} thành công:`, response);
+          
+          if (response && response.user) {
+            // Hiển thị thông báo thành công ngắn
+            const alertEl = $('<div class="alert alert-success">').text('Đăng nhập thành công! Đang chuyển hướng...');
+            $(errorSelector).after(alertEl);
+            
+            // Xóa thông báo lỗi nếu có
+            localStorage.removeItem(errorKey);
+            
+            // Chuyển hướng tùy theo vai trò
+            setTimeout(function() {
+                if (response.user.vaiTro === 'NhaTuyenDung') {
+                    window.location.href = '/nha-tuyen-dung/quan-ly-cong-viec';
+                } else if (response.user.vaiTro === 'UngVien') {
+                    window.location.href = '/ung-vien/trang-chu';
+                } else if (response.user.vaiTro === 'QuanTriVien' || response.user.vaiTro === 'Admin') {
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    window.location.href = '/';
+                }
+            }, 1000);
+          } else {
+            const errorMsg = 'Đăng nhập thành công nhưng không nhận được thông tin người dùng';
+            $(errorSelector).text(errorMsg).removeClass('d-none');
+            // Lưu thông báo lỗi vào localStorage cho trang hiện tại
+            localStorage.setItem(errorKey, errorMsg);
+          }
+        },
+        error: function(xhr) {
+          console.error(`Lỗi đăng nhập ${role}:`, xhr.status, xhr.responseJSON);
+          
+          let errorMsg = 'Đã xảy ra lỗi khi đăng nhập';
+          
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMsg = xhr.responseJSON.message;
+          } else if (xhr.status === 0) {
+            errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.';
+          } else if (xhr.status === 500) {
+            errorMsg = 'Lỗi máy chủ nội bộ. Vui lòng thử lại sau.';
+          }
+          
+          // Hiển thị lỗi trên trang hiện tại
+          $(errorSelector).text(errorMsg).removeClass('d-none');
+          
+          // Lưu thông báo lỗi vào localStorage cho trang hiện tại
+          localStorage.setItem(errorKey, errorMsg);
+        }
+      });
+    }
+    
+    // Xử lý form đăng nhập ứng viên
+    $('#candidateLoginForm').on('submit', function(e) {
+      e.preventDefault();
+      $('#loginError').addClass('d-none');
+      
+      const formData = {
+        tenDN: $('#candidate_tenDN').val(),
+        matKhau: $('#candidate_matKhau').val(),
+        vaiTro: 'UngVien'
+      };
+      
+      handleLogin('UngVien', formData);
+    });
+    
+    // Xử lý form đăng nhập nhà tuyển dụng
+    $('#recruiterLoginForm').on('submit', function(e) {
+      e.preventDefault();
+      $('#loginError').addClass('d-none');
+      
+      const formData = {
+        tenDN: $('#recruiter_tenDN').val(),
+        matKhau: $('#recruiter_matKhau').val(),
+        vaiTro: 'NhaTuyenDung'
+      };
+      
+      handleLogin('NhaTuyenDung', formData);
+    });
+    
+    // Xử lý hiển thị/ẩn mật khẩu
+    $('.toggle-password').on('click', function() {
+      const targetId = $(this).data('target');
+      const passwordInput = $(targetId);
+      const icon = $(this).find('i');
+      
+      if (passwordInput.attr('type') === 'password') {
+        passwordInput.attr('type', 'text');
+        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+      } else {
+        passwordInput.attr('type', 'password');
+        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+      }
+    });
+  });
+</script>
+
+<%- contentFor('extraCSS') %>
+<style>
+  .toggle-password {
+    cursor: pointer;
+  }
+  .nav-tabs .nav-link {
+    color: #444;
+  }
+  .nav-tabs .nav-link.active {
+    font-weight: bold;
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+  }
+</style>

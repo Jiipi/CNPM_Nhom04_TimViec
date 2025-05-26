@@ -1,0 +1,177 @@
+<%- contentFor('body') %>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 bg-light p-0">
+            <%- include('../partials/sidebar-nha-tuyen-dung') %>
+        </div>
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="bg-light-subtle p-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/quan-ly-cong-viec">Quản lý công việc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Danh sách công việc đã đăng</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="bg-white p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Danh sách công việc đã đăng</h2>
+                    <a href="/dang-tuyen-dung" class="btn btn-primary">
+                        <i class="fas fa-plus-circle mr-1"></i> Đăng tin mới
+                    </a>
+                </div>
+
+                <% if (typeof jobs !== 'undefined' && jobs.length > 0) { %>
+                    <% jobs.forEach(job => { %>
+                        <div class="job-item p-3 mb-3 border rounded">
+                            <div class="d-flex">
+                                <div class="job-logo mr-3">
+                                    <img src="/images/kg_logo.jpg" alt="<%= company?.tenCongTy || 'K&G Technology' %>" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #eee;">
+                                </div>
+                                <div class="job-info flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="text-primary mb-1"><%= job.tenCV %></h5>
+                                            <p class="mb-1 text-muted"><%= job.diaDiem %></p>
+                                            <p class="mb-1">
+                                                <span class="badge badge-info mr-1"><%= job.hinhThucLamViec || 'Toàn thời gian' %></span>
+                                                <span class="badge badge-success">Lương: <%= job.luong ? job.luong.toLocaleString('vi-VN') + ' VNĐ' : 'Thỏa thuận' %></span>
+                                            </p>
+                                        </div>
+                                        <div class="job-actions">
+                                            <a href="/danh-sach-ung-vien/<%= job._id %>" class="btn btn-info btn-sm">
+                                                <i class="fas fa-users"></i> Xem ứng viên (<%= job.donUngTuyen ? job.donUngTuyen.length : 0 %>)
+                                            </a>
+                                            <a href="/xem-ho-so-ung-vien/<%= job._id %>" class="btn btn-success btn-sm ml-1">
+                                                <i class="fas fa-file-alt"></i> Xem CV
+                                            </a>
+                                            <a href="/chinh-sua-cong-viec/<%= job._id %>" class="btn btn-outline-primary btn-sm ml-1">Chỉnh sửa</a>
+                                            <a href="javascript:void(0)" onclick="if(confirm('Bạn có chắc chắn muốn xóa công việc <%= job.tenCV %> không?')) { window.location.href='/xoa-cong-viec/<%= job._id %>'; }" class="btn btn-outline-danger btn-sm ml-1">
+                                                Xóa
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="job-meta mt-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock mr-1"></i> Đăng ngày: <%= new Date(job.ngayDang).toLocaleDateString('vi-VN') %>
+                                        </small>
+                                        <small class="text-muted ml-3">
+                                            <i class="fas fa-eye mr-1"></i> Lượt xem: <%= job.luotXem || 0 %>
+                                        </small>
+                                        <small class="text-muted ml-3">
+                                            <i class="fas fa-users mr-1"></i> Lượt ứng tuyển: <%= job.donUngTuyen ? job.donUngTuyen.length : 0 %>
+                                        </small>
+                                        <small class="text-muted ml-3">
+                                            <i class="fas fa-file-search mr-1"></i> Lượt xem hồ sơ: <%= job.luotXemHoSo || 0 %>
+                                        </small>
+                                        <% 
+                                        let statusClass = '';
+                                        let statusText = job.trangThai || 'Đang tuyển';
+                                        
+                                        if (statusText === 'Đang tuyển') {
+                                            statusClass = 'badge-success';
+                                        } else if (statusText === 'Đợi duyệt') {
+                                            statusClass = 'badge-warning';
+                                        } else if (statusText === 'Bị từ chối') {
+                                            statusClass = 'badge-danger';
+                                        } else {
+                                            statusClass = 'badge-secondary';
+                                        }
+                                        %>
+                                        <span class="ml-3 badge <%= statusClass %>" data-toggle="tooltip" title="<%= statusText === 'Đợi duyệt' ? 'Bài đăng đang chờ quản trị viên phê duyệt' : (statusText === 'Đang tuyển' ? 'Bài đăng đã được phê duyệt và đang hiển thị trên trang việc làm' : 'Bài đăng đã bị từ chối bởi quản trị viên') %>">
+                                            <%= statusText %>
+                                        </span>
+                                        <% if (statusText === 'Đợi duyệt') { %>
+                                            <small class="text-muted ml-2"><i class="fas fa-info-circle"></i> Đang chờ quản trị viên phê duyệt</small>
+                                        <% } else if (statusText === 'Bị từ chối') { %>
+                                            <small class="text-danger ml-2"><i class="fas fa-info-circle"></i> Đã bị từ chối bởi quản trị viên</small>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="alert alert-info">
+                        <p class="mb-0">Bạn chưa đăng công việc nào.</p>
+                        <a href="/dang-tuyen-dung" class="btn btn-primary mt-3">Đăng tin tuyển dụng ngay</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Không sử dụng modal để đơn giản hóa chức năng -->
+
+<%- contentFor('extraJS') %>
+<script>
+// Hàm xóa công việc - được gọi trực tiếp từ thuộc tính onclick
+function confirmDeleteJob(jobId, jobName, buttonElement) {
+    console.log('Xác nhận xóa công việc:', { id: jobId, name: jobName });
+    
+    // Xác nhận xóa
+    if (confirm(`Bạn có chắc chắn muốn xóa công việc "${jobName}"?\n\nHành động này sẽ xóa tất cả dữ liệu liên quan và không thể khôi phục.`)) {
+        // Hiển thị trạng thái đang xóa
+        $(buttonElement).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        
+        // Tìm phần tử cha cần xóa
+        const $jobElement = $(buttonElement).closest('.job-item');
+        
+        // Gọi API xóa công việc
+        $.ajax({
+            url: `/api/cong-viec/${jobId}`,
+            method: 'DELETE',
+            success: function(response) {
+                console.log('Xóa công việc thành công:', response);
+                
+                // Hiển thị thông báo thành công
+                alert('Xóa công việc thành công!');
+                
+                // Xóa phần tử khỏi DOM với hiệu ứng mờ dần
+                $jobElement.fadeOut(400, function() {
+                    $(this).remove();
+                    
+                    // Kiểm tra nếu không còn công việc nào
+                    if ($('.job-item').length === 0) {
+                        $('.bg-white.p-4.mb-4').append(`
+                            <div class="alert alert-info">
+                                <p class="mb-0">Bạn chưa đăng công việc nào.</p>
+                                <a href="/dang-tuyen-dung" class="btn btn-primary mt-3">Đăng tin tuyển dụng ngay</a>
+                            </div>
+                        `);
+                    }
+                });
+            },
+            error: function(xhr) {
+                console.error('Lỗi khi xóa công việc:', xhr);
+                
+                // Lấy thông báo lỗi
+                let errorMessage = 'Không thể xóa công việc. Vui lòng thử lại sau.';
+                try {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                } catch (e) {}
+                
+                // Hiển thị thông báo lỗi
+                alert('Lỗi: ' + errorMessage);
+                
+                // Khôi phục nút xóa
+                $(buttonElement).prop('disabled', false).html('Xóa');
+            }
+        });
+        
+        // Ngăn chặn hành vi mặc định của nút
+        return false;
+    }
+}
+
+$(document).ready(function() {
+    console.log('Trang quản lý công việc đã sẵn sàng');
+    
+    // Lưu ý: Hàm xử lý click nút xóa đã được thay thế bằng hàm confirmDeleteJob
+    // được gọi trực tiếp từ thuộc tính onclick
+});
+</script>

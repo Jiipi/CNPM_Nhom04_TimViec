@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Chi tiết thông báo - Hệ Thống Tuyển Dụng' %></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .message-subject {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .message-content {
+        border-left: 4px solid #007bff;
+    }
+    
+    .content-text {
+        line-height: 1.6;
+    }
+    
+    .related-job {
+        border-left: 3px solid #28a745;
+    }
+  </style>
+</head>
+<body>
+<section class="message-detail-section py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Chi tiết thông báo</h3>
+                        <a href="/hop-thu" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-2"></i>Quay lại hộp thư
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <% if (locals.thongBao) { %>
+                            <div class="message-header mb-4">
+                                <h4 class="message-subject mb-3"><%= thongBao.tieuDe %></h4>
+                                <div class="message-meta d-flex justify-content-between">
+                                    <div>
+                                        <p class="mb-1">
+                                            <strong>Từ:</strong> 
+                                            <% if (thongBao.nguoiTao && thongBao.nguoiTao.thongTin && thongBao.nguoiTao.thongTin.tenCongTy) { %>
+                                              <%= thongBao.nguoiTao.thongTin.tenCongTy %>
+                                            <% } else if (thongBao.nguoiTao && thongBao.nguoiTao.hoTen) { %>
+                                              <%= thongBao.nguoiTao.hoTen %>
+                                            <% } else { %>
+                                              Không xác định
+                                            <% } %>
+                                        </p>
+                                        <% if (thongBao.nguoiTao && thongBao.nguoiTao.email) { %>
+                                            <p class="mb-1"><strong>Email:</strong> <%= thongBao.nguoiTao.email %></p>
+                                        <% } %>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="mb-1"><strong>Ngày gửi:</strong> <%= new Date(thongBao.ngayTao).toLocaleDateString('vi-VN') %></p>
+                                        <p class="mb-1"><strong>Thời gian:</strong> <%= new Date(thongBao.ngayTao).toLocaleTimeString('vi-VN') %></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="message-content p-4 bg-light rounded">
+                                <div class="content-text">
+                                    <p><%= thongBao.noiDung %></p>
+                                </div>
+                                
+                                <% if (thongBao.congViecLienQuan) { %>
+                                    <div class="related-job mt-4 p-3 bg-white rounded">
+                                        <h5 class="mb-3">Việc làm liên quan:</h5>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1"><%= thongBao.congViecLienQuan.tenCV %></h6>
+                                                <p class="mb-0 text-muted"><%= thongBao.congViecLienQuan.diaDiem %></p>
+                                            </div>
+                                            <a href="/chi-tiet-viec-lam/<%= thongBao.congViecLienQuan._id %>" class="btn btn-sm btn-primary">
+                                                Xem việc làm
+                                            </a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                            
+                            <% if (thongBao.coTheTraLoi) { %>
+                                <div class="reply-section mt-4">
+                                    <h5 class="mb-3">Trả lời thông báo</h5>
+                                    <form action="/tra-loi-thong-bao" method="POST">
+                                        <input type="hidden" name="thongBaoId" value="<%= thongBao._id %>">
+                                        <div class="form-group">
+                                            <textarea name="noiDungTraLoi" class="form-control" rows="5" placeholder="Nhập nội dung trả lời..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane mr-2"></i>Gửi trả lời
+                                        </button>
+                                    </form>
+                                </div>
+                            <% } %>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+                                <h4 class="text-muted">Không tìm thấy thông báo</h4>
+                                <p class="text-muted">Thông báo này không tồn tại hoặc đã bị xóa</p>
+                                <a href="/hop-thu" class="btn btn-primary mt-2">Quay lại hộp thư</a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Đánh dấu là đã đọc khi mở thông báo
+        const thongBaoId = '<%= locals.thongBao ? thongBao._id : "" %>';
+        if (thongBaoId) {
+            $.ajax({
+                url: '/api/danh-dau-da-doc',
+                method: 'POST',
+                data: { thongBaoId: thongBaoId },
+                success: function(response) {
+                    console.log('Đánh dấu thông báo đã đọc thành công');
+                },
+                error: function(error) {
+                    console.error('Lỗi khi đánh dấu thông báo đã đọc', error);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html> 

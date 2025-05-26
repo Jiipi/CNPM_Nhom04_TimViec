@@ -1,0 +1,257 @@
+<%- contentFor('body') %>
+<section class="job-details-section py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card job-details mb-4">
+                    <div class="card-body">
+                        <h2 class="job-title mb-3"><%= congViec.tenCV %></h2>
+                        
+                        <div class="company-info d-flex align-items-center mb-4">
+                            <% if (congViec.maND && congViec.maND.thongTin && congViec.maND.thongTin.logo) { %>
+                                <img src="<%= congViec.maND.thongTin.logo %>" alt="<%= congViec.maND.thongTin.tenCongTy || congViec.maND.hoTen %>" class="company-logo mr-3" style="max-width: 60px; max-height: 60px;">
+                            <% } else { %>
+                                <img src="/images/logo.jpg" alt="Company Logo" class="company-logo mr-3" style="max-width: 60px; max-height: 60px;">
+                            <% } %>
+                            <div>
+                                <h5 class="company-name text-warning mb-1">
+                                    <a href="/chi-tiet-cong-ty/<%= congViec.maND ? congViec.maND._id : congViec._id %>" class="text-warning">
+                                        <%= congViec.maND && congViec.maND.thongTin && congViec.maND.thongTin.tenCongTy ? congViec.maND.thongTin.tenCongTy : (congViec.tenCongTy || 'Công ty chưa xác định') %>
+                                    </a>
+                                </h5>
+                                <div class="job-meta">
+                                    <span class="mr-3"><i class="fas fa-map-marker-alt mr-1"></i> <%= congViec.diaDiem || 'Chưa cập nhật' %></span>
+                                    <span><i class="far fa-clock mr-1"></i> Đăng ngày: <%= new Date(congViec.ngayDang).toLocaleDateString('vi-VN') %></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="job-highlight-info mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-2"><i class="fas fa-money-bill-wave mr-2 text-success"></i> Mức lương</h6>
+                                            <p class="mb-0 font-weight-bold"><%= congViec.luong ? congViec.luong.toLocaleString('vi-VN') + ' VNĐ' : 'Thỏa thuận' %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-2"><i class="fas fa-briefcase mr-2 text-primary"></i> Kinh nghiệm</h6>
+                                            <p class="mb-0 font-weight-bold"><%= congViec.kinhNghiem || 'Không yêu cầu' %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-2"><i class="fas fa-graduation-cap mr-2 text-warning"></i> Học vấn</h6>
+                                            <p class="mb-0 font-weight-bold"><%= congViec.hocVan || 'Không yêu cầu' %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="mb-2"><i class="fas fa-user-tie mr-2 text-danger"></i> Hình thức làm việc</h6>
+                                            <p class="mb-0 font-weight-bold"><%= congViec.hinhThucLamViec || 'Toàn thời gian' %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="job-description mb-4">
+                            <h4 class="section-title">Mô tả công việc</h4>
+                            <div class="content">
+                                <p><%= congViec.moTa || 'Không có mô tả công việc.' %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="job-skills mb-4">
+                            <h4 class="section-title">Kỹ năng yêu cầu</h4>
+                            <% if (congViec.kyNang && congViec.kyNang.length > 0) { %>
+                                <div class="skills-list">
+                                    <% congViec.kyNang.forEach(skill => { %>
+                                        <span class="badge badge-light p-2 mr-2 mb-2"><%= skill %></span>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <div class="job-skills-description mt-3">
+                                    <ul class="pl-3">
+                                        <li class="mb-2">Có kiến thức nền tảng về lập trình và thuật toán</li>
+                                        <li class="mb-2">Thành thạo các công cụ và quy trình kiểm thử phần mềm</li>
+                                        <li class="mb-2">Có khả năng tự động hóa các bài test</li>
+                                        <li class="mb-2">Có kinh nghiệm sử dụng các framework testing như Selenium, JUnit, TestNG</li>
+                                        <li class="mb-2">Có kỹ năng phân tích và xác định lỗi</li>
+                                        <li class="mb-2">Tiếng Anh đọc hiểu tài liệu chuyên ngành</li>
+                                    </ul>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <div class="job-benefits mb-4">
+                            <h4 class="section-title">Quyền lợi</h4>
+                            <% if (congViec.loiIch) { %>
+                            <div class="content">
+                                <p><%= congViec.loiIch %></p>
+                            </div>
+                            <% } else { %>
+                            <div class="job-benefits-description mt-3">
+                                <ul class="pl-3">
+                                    <li class="mb-2">Lương thưởng cạnh tranh, phụ cấp đầy đủ theo quy định</li>
+                                    <li class="mb-2">Được đóng BHXH, BHYT, BHTN đầy đủ theo quy định</li>
+                                    <li class="mb-2">Thưởng các dịp lễ tết, thưởng theo hiệu quả công việc</li>
+                                    <li class="mb-2">Môi trường làm việc chuyên nghiệp, năng động, thân thiện</li>
+                                    <li class="mb-2">Cơ hội học hỏi, đào tạo và thăng tiến trong công việc</li>
+                                    <li class="mb-2">Tham gia các hoạt động team building, du lịch hàng năm</li>
+                                </ul>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card apply-card mb-4">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-4">Ứng tuyển ngay</h5>
+                        <% if (locals.user && locals.user.vaiTro === 'UngVien') { %>
+                            <a href="/ung-tuyen?congViecId=<%= congViec._id %>" class="btn btn-primary btn-lg btn-block mb-3">
+                                <i class="fas fa-paper-plane mr-2"></i> Ứng tuyển ngay
+                            </a>
+                            <button class="btn btn-outline-primary btn-block mb-3" id="saveJobBtn" data-job-id="<%= congViec._id %>">
+                                <i class="far fa-heart mr-2"></i> Lưu việc làm
+                            </button>
+                            <a href="/hop-thu" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-envelope mr-2"></i> Hộp thư
+                            </a>
+                        <% } else if (!locals.user) { %>
+                            <a href="/dang-nhap?redirect=/chi-tiet-viec-lam/<%= congViec._id %>" class="btn btn-primary btn-lg btn-block mb-3">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập để ứng tuyển
+                            </a>
+                        <% } else { %>
+                            <p class="text-danger">Bạn cần có tài khoản ứng viên để ứng tuyển việc làm này.</p>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="card company-card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Thông tin công ty</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <% if (congViec.maND && congViec.maND.thongTin && congViec.maND.thongTin.logo) { %>
+                                <img src="<%= congViec.maND.thongTin.logo %>" alt="<%= congViec.maND.thongTin.tenCongTy || congViec.maND.hoTen %>" class="company-logo mb-3" style="max-width: 120px; max-height: 120px;">
+                            <% } else { %>
+                                <img src="/images/logo.jpg" alt="Company Logo" class="company-logo mb-3" style="max-width: 120px; max-height: 120px;">
+                            <% } %>
+                            <h5 class="company-name text-warning">
+                                <a href="/chi-tiet-cong-ty/<%= congViec.maND ? congViec.maND._id : congViec._id %>" class="text-warning">
+                                    <%= congViec.maND && congViec.maND.thongTin && congViec.maND.thongTin.tenCongTy ? congViec.maND.thongTin.tenCongTy : (congViec.tenCongTy || 'Công ty chưa xác định') %>
+                                </a>
+                            </h5>
+                        </div>
+                        
+                        <ul class="list-unstyled">
+                            <% if (congViec.maND && congViec.maND.thongTin && congViec.maND.thongTin.diaChi) { %>
+                                <li class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i> <%= congViec.maND.thongTin.diaChi %></li>
+                            <% } %>
+                            <% if (congViec.maND && congViec.maND.thongTin && congViec.maND.thongTin.website) { %>
+                                <li class="mb-2"><i class="fas fa-globe mr-2"></i> <a href="<%= congViec.maND.thongTin.website %>" target="_blank"><%= congViec.maND.thongTin.website %></a></li>
+                            <% } %>
+                            <% if (congViec.maND && congViec.maND.email) { %>
+                                <li class="mb-2"><i class="fas fa-envelope mr-2"></i> <%= congViec.maND.email %></li>
+                            <% } %>
+                        </ul>
+                        
+                        <a href="/chi-tiet-cong-ty/<%= congViec.maND ? congViec.maND._id : congViec._id %>" class="btn btn-outline-primary btn-block">
+                            <i class="fas fa-building mr-2"></i> Xem thông tin công ty
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .job-title {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .company-logo {
+        border: 1px solid #eee;
+        padding: 5px;
+        background-color: #fff;
+    }
+    
+    .text-warning {
+        color: #fd7e14 !important;
+    }
+    
+    .company-name {
+        font-weight: 500;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 1rem;
+    }
+    
+    .badge {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .job-highlight-info .card {
+        transition: all 0.3s ease;
+    }
+    
+    .job-highlight-info .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        // Xử lý lưu việc làm
+        $('#saveJobBtn').click(function() {
+            const jobId = $(this).data('job-id');
+            const btn = $(this);
+            
+            $.ajax({
+                url: '/api/viec-yeu-thich',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ congViecId: jobId }),
+                success: function(response) {
+                    btn.html('<i class="fas fa-heart text-danger mr-2"></i> Đã lưu');
+                    btn.prop('disabled', true);
+                    alert('Đã lưu việc làm vào danh sách yêu thích');
+                },
+                error: function(error) {
+                    console.error(error);
+                    if (error.responseJSON && error.responseJSON.message === 'Công việc đã được lưu trước đó') {
+                        alert('Việc làm này đã được lưu trước đó');
+                        btn.html('<i class="fas fa-heart text-danger mr-2"></i> Đã lưu');
+                        btn.prop('disabled', true);
+                    } else {
+                        alert('Lỗi khi lưu việc làm: ' + (error.responseJSON ? error.responseJSON.message : 'Không xác định'));
+                    }
+                }
+            });
+        });
+    });
+</script>

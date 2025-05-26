@@ -1,0 +1,68 @@
+<%- contentFor('title') %>Đăng Nhập - Hệ Thống Tuyển Dụng
+
+<%- contentFor('body') %>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow rounded-lg">
+        <div class="card-body p-5">
+          <div class="text-center mb-5">
+            <h2 class="font-weight-bold">Chọn loại tài khoản đăng nhập</h2>
+            <p class="text-muted">Vui lòng chọn loại tài khoản để đăng nhập vào hệ thống</p>
+          </div>
+          
+          <div class="row justify-content-center">
+            <div class="col-md-5 mb-4">
+              <div class="card h-100 type-card" onclick="window.location.href='/ung-vien/dang-nhap'">
+                <div class="card-body text-center p-4">
+                  <div class="mb-3">
+                    <i class="fas fa-user fa-3x text-primary"></i>
+                  </div>
+                  <h4 class="card-title">Ứng Viên</h4>
+                  <p class="card-text text-muted">Tìm kiếm việc làm, ứng tuyển và quản lý hồ sơ</p>
+                  <a href="/ung-vien/dang-nhap" class="btn btn-outline-primary mt-3 btn-block">Đăng nhập</a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-5 mb-4">
+              <div class="card h-100 type-card" onclick="window.location.href='/nha-tuyen-dung/dang-nhap'">
+                <div class="card-body text-center p-4">
+                  <div class="mb-3">
+                    <i class="fas fa-building fa-3x text-success"></i>
+                  </div>
+                  <h4 class="card-title">Nhà Tuyển Dụng</h4>
+                  <p class="card-text text-muted">Đăng tin tuyển dụng và quản lý ứng viên</p>
+                  <a href="/nha-tuyen-dung/dang-nhap" class="btn btn-outline-success mt-3 btn-block">Đăng nhập</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-4 text-center">
+            <p>Chưa có tài khoản? <a href="/dang-ky">Đăng ký ngay</a></p>
+            <a href="/" class="text-muted"><i class="fas fa-arrow-left mr-2"></i>Quay về trang chủ</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- contentFor('extraCSS') %>
+<style>
+.type-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.type-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-block {
+  border-radius: 30px;
+}
+</style> 

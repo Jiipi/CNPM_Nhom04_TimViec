@@ -1,0 +1,287 @@
+<%- contentFor('body') %>
+<section class="jobs-listing-section py-4">
+<div class="container">
+        <h2 class="section-title text-primary">Trang Tuyển dụng</h2>
+        
+        <% if (locals.user && (locals.user.vaiTro === 'QuanTriVien' || locals.user.vaiTro === 'Admin') && typeof pendingJobsCount !== 'undefined' && pendingJobsCount > 0) { %>
+        <!-- Thông báo cho quản trị viên về số lượng công việc đang chờ duyệt -->
+        <div class="alert alert-warning mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-circle fa-2x mr-3"></i>
+                <div>
+                    <strong>Quản trị viên:</strong> Có <%= pendingJobsCount %> công việc đang đợi phê duyệt.
+                    <a href="/phe-duyet-viec-lam" class="btn btn-sm btn-warning ml-2">Xem ngay</a>
+                </div>
+            </div>
+        </div>
+        <% } %>
+        
+        <!-- Search Bar -->
+        <div class="jobs-search-bar mb-4">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <form action="/viec-lam" method="GET">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="keyword" value="<%= typeof keyword !== 'undefined' ? keyword : '' %>" placeholder="Nhập từ khóa...">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i> Tìm kiếm
+                                </button>
+                        </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Options -->
+        <div class="filter-options mb-4">
+            <div class="row">
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="dropdown">
+                        <select name="category" class="form-control" id="categoryDropdown" onchange="filterJobs()">
+                            <option value="">Ngành nghề</option>
+                            <option value="cntt" <%= typeof category !== 'undefined' && category === 'cntt' ? 'selected' : '' %>>Phần mềm</option>
+                            <option value="phan-cung">Phần cứng</option>
+                            <option value="tu-van">Tư vấn</option>
+                            <option value="khac">Khác</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="dropdown">
+                        <select name="position" class="form-control" id="positionDropdown" onchange="filterJobs()">
+                            <option value="">Vị trí</option>
+                            <option value="developer" <%= typeof position !== 'undefined' && position === 'developer' ? 'selected' : '' %>>Developer</option>
+                            <option value="designer" <%= typeof position !== 'undefined' && position === 'designer' ? 'selected' : '' %>>Designer</option>
+                            <option value="project-manager" <%= typeof position !== 'undefined' && position === 'project-manager' ? 'selected' : '' %>>Project Manager</option>
+                            <option value="tester" <%= typeof position !== 'undefined' && position === 'tester' ? 'selected' : '' %>>Tester</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="dropdown">
+                        <select name="salary" class="form-control" id="salaryDropdown" onchange="filterJobs()">
+                            <option value="">Mức lương</option>
+                            <option value="0-10" <%= typeof salary !== 'undefined' && salary === '0-10' ? 'selected' : '' %>>Dưới 10 triệu</option>
+                            <option value="10-15" <%= typeof salary !== 'undefined' && salary === '10-15' ? 'selected' : '' %>>10-15 triệu</option>
+                            <option value="15-25" <%= typeof salary !== 'undefined' && salary === '15-25' ? 'selected' : '' %>>15-25 triệu</option>
+                            <option value="25+" <%= typeof salary !== 'undefined' && salary === '25+' ? 'selected' : '' %>>Trên 25 triệu</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                <div class="dropdown">
+                        <select name="experience" class="form-control" id="experienceDropdown" onchange="filterJobs()">
+                            <option value="">Kinh nghiệm</option>
+                            <option value="0" <%= typeof experience !== 'undefined' && experience === '0' ? 'selected' : '' %>>Chưa có kinh nghiệm</option>
+                            <option value="0-1" <%= typeof experience !== 'undefined' && experience === '0-1' ? 'selected' : '' %>>Dưới 1 năm</option>
+                            <option value="1-3" <%= typeof experience !== 'undefined' && experience === '1-3' ? 'selected' : '' %>>1-3 năm</option>
+                            <option value="3-5" <%= typeof experience !== 'undefined' && experience === '3-5' ? 'selected' : '' %>>3-5 năm</option>
+                            <option value="5+" <%= typeof experience !== 'undefined' && experience === '5+' ? 'selected' : '' %>>Trên 5 năm</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Listing Results -->
+        <div class="job-results mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="result-count">
+                    <strong><%= typeof jobs !== 'undefined' ? jobs.length : 0 %></strong> việc làm
+                </div>
+                <div class="sort-options">
+                    <span>Sắp xếp</span>
+                    <select class="form-control-sm border-0 ml-2" id="sortDropdown" onchange="filterJobs()">
+                        <option value="latest" <%= typeof sort !== 'undefined' && sort === 'latest' ? 'selected' : '' %>>Mới cập nhật</option>
+                        <option value="salary-desc" <%= typeof sort !== 'undefined' && sort === 'salary-desc' ? 'selected' : '' %>>Lương cao nhất</option>
+                        <option value="relevance" <%= typeof sort !== 'undefined' && sort === 'relevance' ? 'selected' : '' %>>Phù hợp nhất</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Job List -->
+            <div class="job-list">
+            <% if (typeof jobs !== 'undefined' && jobs.length > 0) { %>
+                    <% jobs.forEach(job => { %>
+                        <div class="job-item card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <% 
+                                    // Xác định ID công ty phù hợp 
+                                    let companyId = "kg"; // Mặc định KG Technology
+                                    let companyName = job.tenCongTy || 'Công ty chưa xác định';
+                                    let companyLogo = '/images/kg_logo.jpg'; // Mặc định sử dụng logo K&G
+                                    
+                                    // Phân loại theo tên công ty
+                                    if (companyName.toLowerCase().includes('fpt')) {
+                                        companyId = "fpt";
+                                        companyLogo = '/images/fpt_logo.jpg';
+                                    } else if (companyName.toLowerCase().includes('cmc')) {
+                                        companyId = "cmc";
+                                        companyLogo = '/images/cmc_logo.jpg';
+                                    } else if (companyName.toLowerCase().includes('viettel')) {
+                                        companyId = "viettel";
+                                        companyLogo = '/images/viettel_logo.jpg';
+                                    } else if (companyName.toLowerCase().includes('momo')) {
+                                        companyId = "momo";
+                                        companyLogo = '/images/momo_logo.png';
+                                    }
+                                    %>
+                                    <div class="col-md-2 col-4">
+                                        <img src="<%= companyLogo || job.logoUrl %>" alt="<%= job.tenCongTy %>" class="img-fluid company-logo" style="max-width: 80px; max-height: 80px;">
+                                    </div>
+                                    <div class="col-md-8 col-8">
+                                        <h5 class="job-company">
+                                            <a href="/chi-tiet-cong-ty/<%= companyId %>" class="text-warning"><%= companyName %></a>
+                                        </h5>
+                                        <h4 class="job-title"><a href="/chi-tiet-viec-lam/<%= job._id %>" class="text-dark"
+                                           onclick="console.log('Đang chuyển đến: /chi-tiet-viec-lam/<%= job._id %>'); 
+                                                    alert('Đang chuyển đến trang chi tiết việc làm...'); 
+                                                    return true;"><%= job.tenCV %></a></h4>
+                                        <div class="job-meta">
+                                            <span><i class="fas fa-money-bill-wave mr-1"></i> <%= job.luong ? job.luong.toLocaleString('vi-VN') : '0' %> VNĐ</span>
+                                            <span class="ml-3"><i class="fas fa-map-marker-alt mr-1"></i> <%= job.diaDiem || 'Chưa cập nhật' %></span>
+                                        </div>
+                                        <% if (job.kyNang && job.kyNang.length > 0) { %>
+                                            <div class="job-tags mt-2">
+                                                <% job.kyNang.slice(0, 3).forEach(skill => { %>
+                                                    <span class="badge badge-light"><%= skill %></span>
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-md-2 mt-3 mt-md-0">
+                                        <div class="job-actions text-right">
+                                            <div class="job-update mb-2">Cập nhật: <%= job.ngayDangFormat || new Date(job.ngayDang).toLocaleDateString('vi-VN') %></div>
+                                        <% if (locals.user && locals.user.vaiTro === 'UngVien') { %>
+                                                <button class="btn btn-sm btn-outline-primary save-job-btn" data-job-id="<%= job._id %>">
+                                                    <i class="far fa-heart"></i> Lưu
+                                            </button>
+                                            <% } else { %>
+                                                <a href="/dang-nhap" class="btn btn-sm btn-outline-primary">
+                                                    <i class="far fa-heart"></i> Lưu
+                                                </a>
+                                        <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+            <% } else { %>
+                <div class="alert alert-info text-center p-5">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <h4>Không tìm thấy việc làm phù hợp</h4>
+                    <p>Vui lòng thử lại với từ khóa khác hoặc xem tất cả việc làm hiện có.</p>
+                    <a href="/viec-lam" class="btn btn-primary">Xem tất cả việc làm</a>
+                </div>
+            <% } %>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-container mt-4 mb-2 text-center">
+                <nav aria-label="Job search result pages">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- contentFor('extraCSS') %>
+<style>
+.job-company {
+    color: #fd7e14 !important; /* Màu cam như trong hình mẫu */
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.job-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.company-logo {
+    border: 1px solid #eee;
+    padding: 5px;
+    background-color: #fff;
+    max-width: 80px;
+    max-height: 80px;
+}
+
+.job-item {
+    transition: all 0.3s ease;
+}
+
+.job-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.job-meta {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.badge {
+    margin-right: 5px;
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 400;
+}
+</style>
+
+<%- contentFor('extraJS') %>
+<script>
+  $(document).ready(function() {
+    // Xử lý lưu việc làm yêu thích
+    $('.save-job-btn').click(function() {
+      const jobId = $(this).data('job-id');
+      const btn = $(this);
+      
+      $.ajax({
+        url: '/api/viec-yeu-thich',
+        method: 'POST',
+        data: { congViecId: jobId },
+        success: function(response) {
+          btn.html('<i class="fas fa-heart text-danger"></i> Đã lưu');
+          btn.prop('disabled', true);
+        },
+        error: function(error) {
+          alert('Lỗi khi lưu việc làm. Vui lòng thử lại sau!');
+          console.error(error);
+        }
+      });
+    });
+    
+    // Hàm submit form khi thay đổi bộ lọc
+    window.filterJobs = function() {
+      const keyword = $('input[name="keyword"]').val();
+      const category = $('#categoryDropdown').val();
+      const position = $('#positionDropdown').val();
+      const salary = $('#salaryDropdown').val();
+      const experience = $('#experienceDropdown').val();
+      const sort = $('#sortDropdown').val();
+      
+      // Tạo URL mới với các tham số
+      let url = '/viec-lam?';
+      if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
+      if (category) url += `category=${encodeURIComponent(category)}&`;
+      if (position) url += `position=${encodeURIComponent(position)}&`;
+      if (salary) url += `salary=${encodeURIComponent(salary)}&`;
+      if (experience) url += `experience=${encodeURIComponent(experience)}&`;
+      if (sort) url += `sort=${encodeURIComponent(sort)}&`;
+      
+      // Chuyển hướng đến URL mới
+      window.location.href = url;
+    };
+  });
+</script>

@@ -1,0 +1,128 @@
+<%- contentFor('body') %>
+
+<div class="container-fluid my-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h1 class="h3 mb-0">Hồ sơ nhà tuyển dụng</h1>
+        </div>
+        <div class="card-body">
+          <% if (nhaTuyenDung) { %>
+            <div class="row">
+              <div class="col-md-4 text-center mb-4">
+                <% const logoUrl = nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.logo ? nhaTuyenDung.thongTin.logo : '/public/images/default-company-logo.jpg' %>
+                <img src="<%= logoUrl %>" alt="Logo công ty" class="img-fluid rounded" style="max-width: 200px;">
+                <div class="mt-3">
+                  <a href="/cap-nhat-logo" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-camera"></i> Cập nhật logo
+                  </a>
+                </div>
+              </div>
+              
+              <div class="col-md-8">
+                <form id="companyProfileForm" action="/api/cap-nhat-ho-so-nha-tuyen-dung" method="POST">
+                  <div class="mb-3">
+                    <label for="tenCongTy" class="form-label">Tên công ty</label>
+                    <input type="text" class="form-control" id="tenCongTy" name="tenCongTy" 
+                      value="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.tenCongTy ? nhaTuyenDung.thongTin.tenCongTy : '' %>">
+                  </div>
+                  
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="email" name="email" value="<%= nhaTuyenDung.email %>" readonly>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="sdt" class="form-label">Số điện thoại</label>
+                      <input type="text" class="form-control" id="sdt" name="sdt" value="<%= nhaTuyenDung.sdt || '' %>">
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="diaChi" class="form-label">Địa chỉ</label>
+                    <input type="text" class="form-control" id="diaChi" name="diaChi" 
+                      value="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.diaChi ? nhaTuyenDung.thongTin.diaChi : '' %>">
+                  </div>
+                  
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="quyMo" class="form-label">Quy mô công ty</label>
+                      <select class="form-select" id="quyMo" name="quyMo">
+                        <option value="Dưới 15 nhân viên" <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo === 'Dưới 15 nhân viên' ? 'selected' : '' %>>Dưới 15 nhân viên</option>
+                        <option value="15-99 nhân viên" <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo === '15-99 nhân viên' ? 'selected' : '' %>>15-99 nhân viên</option>
+                        <option value="100-499 nhân viên" <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo === '100-499 nhân viên' ? 'selected' : '' %>>100-499 nhân viên</option>
+                        <option value="500-1000 nhân viên" <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo === '500-1000 nhân viên' ? 'selected' : '' %>>500-1000 nhân viên</option>
+                        <option value="Trên 1000 nhân viên" <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo === 'Trên 1000 nhân viên' ? 'selected' : '' %>>Trên 1000 nhân viên</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="website" class="form-label">Website</label>
+                      <input type="text" class="form-control" id="website" name="website"
+                        value="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.website ? nhaTuyenDung.thongTin.website : '' %>">
+                    </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label for="moTa" class="form-label">Mô tả công ty</label>
+                    <textarea class="form-control" id="moTa" name="moTa" rows="5"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.moTa ? nhaTuyenDung.thongTin.moTa : '' %></textarea>
+                  </div>
+                  
+                  <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                      <i class="fas fa-save me-2"></i>Cập nhật thông tin
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>Không tìm thấy thông tin nhà tuyển dụng.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('companyProfileForm');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        const tenCongTy = document.getElementById('tenCongTy').value;
+        if (!tenCongTy) {
+          alert('Vui lòng nhập tên công ty');
+          return;
+        }
+        
+        // Submit form via AJAX
+        const formData = new FormData(form);
+        fetch(form.action, {
+          method: 'POST',
+          body: new URLSearchParams(formData),
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Cập nhật thông tin thành công');
+          } else {
+            alert('Lỗi: ' + (data.message || 'Không thể cập nhật thông tin'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Đã xảy ra lỗi khi cập nhật thông tin');
+        });
+      });
+    }
+  });
+</script> 

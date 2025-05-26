@@ -1,0 +1,233 @@
+<%- contentFor('title') %>Đăng tuyển dụng mới
+
+<%- contentFor('body') %>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 bg-light p-0">
+            <%- include('../partials/sidebar-nha-tuyen-dung') %>
+                </div>
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="bg-light-subtle p-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/quan-ly-cong-viec">Quản lý công việc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Đăng tin tuyển dụng</li>
+                    </ol>
+                </nav>
+                        </div>
+                        
+            <div class="bg-white p-4 mb-4">
+                <h2 class="h4 mb-4">ĐĂNG BÀI TUYỂN DỤNG</h2>
+                
+                <!-- Thêm thông báo về việc bài đăng cần phê duyệt -->
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle mr-2"></i> 
+                    <strong>Lưu ý:</strong> Bài đăng tuyển dụng của bạn sẽ được gửi đến quản trị viên để xét duyệt. 
+                    Bài đăng sẽ chỉ xuất hiện trên hệ thống sau khi được phê duyệt.
+                </div>
+                
+                <div class="company-header mb-4 d-flex align-items-center border-bottom pb-3">
+                    <div class="company-logo mr-3">
+                        <img src="<%= company?.logo || '/images/logo-placeholder.png' %>" alt="<%= company?.tenCongTy || 'K&G Technology Company Limited' %>" style="max-width: 80px; max-height: 80px;">
+                    </div>
+                    <div>
+                        <h5><%= company?.tenCongTy || 'K&G Technology Company Limited' %></h5>
+                        <p class="mb-0 text-muted">
+                            <i class="fas fa-map-marker-alt mr-1"></i> 
+                            <%= company?.diaChi || 'Quận 7, Hồ Chí Minh' %>
+                        </p>
+                    </div>
+                        </div>
+                        
+                <form id="recruitmentForm" action="/api/cong-viec" method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                            <!-- Thông tin cơ bản -->
+                            <div class="form-group mb-3">
+                                <label for="tenCV">Vị trí tuyển dụng <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="tenCV" name="tenCV" placeholder="Nhập tên vị trí tuyển dụng" required>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="diaDiem">Địa điểm làm việc <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="diaDiem" name="diaDiem" placeholder="Nhập địa điểm" required>
+                                </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="nganhNghe">Ngành nghề <span class="text-danger">*</span></label>
+                                <select class="form-control" id="nganhNghe" name="nganhNghe" required>
+                                    <option value="" selected disabled>Chọn ngành nghề</option>
+                                    <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                                    <option value="Kinh doanh / Bán hàng">Kinh doanh / Bán hàng</option>
+                                    <option value="Kế toán / Tài chính">Kế toán / Tài chính</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Kỹ thuật">Kỹ thuật</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="luong">Mức lương</label>
+                                <input type="number" class="form-control" id="luong" name="luong" placeholder="Nhập mức lương (VNĐ)">
+                        </div>
+                        
+                            <div class="form-group mb-3">
+                                <label for="kinhNghiem">Kinh nghiệm <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="kinhNghiem" name="kinhNghiem" required>
+                                    <option value="" selected disabled>Chọn yêu cầu kinh nghiệm</option>
+                                        <option value="Không yêu cầu">Không yêu cầu</option>
+                                        <option value="Dưới 1 năm">Dưới 1 năm</option>
+                                        <option value="1-2 năm">1-2 năm</option>
+                                    <option value="2-5 năm">2-5 năm</option>
+                                        <option value="Trên 5 năm">Trên 5 năm</option>
+                                    </select>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="hocVan">Học vấn <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="hocVan" name="hocVan" required>
+                                    <option value="" selected disabled>Chọn yêu cầu học vấn</option>
+                                        <option value="Không yêu cầu">Không yêu cầu</option>
+                                        <option value="Trung cấp">Trung cấp</option>
+                                        <option value="Cao đẳng">Cao đẳng</option>
+                                        <option value="Đại học">Đại học</option>
+                                        <option value="Sau đại học">Sau đại học</option>
+                                    </select>
+                                </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="hinhThucLamViec">Hình thức làm việc <span class="text-danger">*</span></label>
+                                <select class="form-control" id="hinhThucLamViec" name="hinhThucLamViec" required>
+                                    <option value="Full Time">Full Time</option>
+                                    <option value="Part Time">Part Time</option>
+                                    <option value="Freelance">Freelance</option>
+                                    <option value="Remote">Remote</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <!-- Mô tả chi tiết -->
+                            <div class="form-group mb-3">
+                                <label for="moTa">Mô tả công việc <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="moTa" name="moTa" rows="5" placeholder="Viết mô tả công việc" required></textarea>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="yeuCau">Yêu cầu <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="yeuCau" name="yeuCau" rows="5" placeholder="Viết yêu cầu công việc" required></textarea>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="loiIch">Lợi ích <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="loiIch" name="loiIch" rows="5" placeholder="Các lợi ích khi làm việc tại công ty" required></textarea>
+                        </div>
+                        
+                            <div class="form-group mb-3">
+                                <label for="kyNang">Kỹ năng yêu cầu</label>
+                                <input type="text" class="form-control" id="kyNang" name="kyNang" placeholder="Nhập các kỹ năng, phân cách bằng dấu phẩy">
+                                <small class="form-text text-muted">Ví dụ: Java, Spring Boot, SQL, v.v</small>
+                            </div>
+                        </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                        <button type="button" class="btn btn-secondary mr-2 px-4" onclick="window.history.back();">Hủy</button>
+                        <button type="submit" class="btn btn-primary px-5">Đăng bài ứng tuyển</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraJS') %>
+<script>
+$(document).ready(function() {
+    $('#recruitmentForm').submit(function(e) {
+        e.preventDefault();
+        
+        // Kiểm tra dữ liệu đầu vào
+        if (!$('#tenCV').val() || !$('#moTa').val() || !$('#diaDiem').val() || !$('#luong').val() || 
+            !$('#kinhNghiem').val() || !$('#hocVan').val() || !$('#loiIch').val()) {
+            alert('Vui lòng điền đầy đủ các trường bắt buộc');
+            return false;
+        }
+        
+        // Chuyển đổi chuỗi kỹ năng thành mảng
+        let skills = $('#kyNang').val();
+        let skillsArray = [];
+        
+        if (skills) {
+            skillsArray = skills.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0);
+        }
+        
+        // Đảm bảo có ít nhất một kỹ năng
+        if (skillsArray.length === 0) {
+            // Thêm ít nhất một kỹ năng mặc định từ ngành nghề
+            skillsArray.push($('#nganhNghe').val());
+        }
+        
+        // Tạo đối tượng dữ liệu form
+        const formData = {
+            tenCV: $('#tenCV').val(),
+            moTa: $('#moTa').val() + ($('#yeuCau').val() ? '\n\nYêu cầu:\n' + $('#yeuCau').val() : ''),
+            diaDiem: $('#diaDiem').val(),
+            luong: $('#luong').val() ? parseInt($('#luong').val()) : 0,
+            kinhNghiem: $('#kinhNghiem').val(),
+            hocVan: $('#hocVan').val(),
+            kyNang: skillsArray,
+            loiIch: $('#loiIch').val(),
+            nganhNghe: $('#nganhNghe').val(),
+            hinhThucLamViec: $('#hinhThucLamViec').val()
+        };
+        
+        // Hiển thị thông báo đang xử lý
+        $('#recruitmentForm button[type="submit"]').attr('disabled', true).text('Đang xử lý...');
+        
+        $.ajax({
+            url: '/api/cong-viec',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                // Hiển thị hộp thoại thông báo chi tiết về quy trình phê duyệt
+                Swal.fire({
+                    title: 'Đăng tin thành công!',
+                    html: `
+                        <p>Bài đăng tuyển dụng của bạn đã được gửi tới quản trị viên để xét duyệt.</p>
+                        <p><strong>Quy trình tiếp theo:</strong></p>
+                        <ol class="text-left">
+                            <li>Quản trị viên sẽ xem xét nội dung bài đăng của bạn.</li>
+                            <li>Nếu được duyệt, bài đăng sẽ xuất hiện trên trang việc làm.</li>
+                            <li>Bạn sẽ nhận được thông báo khi bài đăng được duyệt hoặc từ chối.</li>
+                        </ol>
+                    `,
+                    icon: 'success',
+                    confirmButtonText: 'Đã hiểu'
+                }).then((result) => {
+                    window.location.href = '/quan-ly-cong-viec';
+                });
+            },
+            error: function(error) {
+                $('#recruitmentForm button[type="submit"]').attr('disabled', false).text('Đăng bài ứng tuyển');
+                console.error('Lỗi:', error);
+                let errorMessage = 'Đã xảy ra lỗi khi đăng tin tuyển dụng';
+                
+                if (error.responseJSON && error.responseJSON.message) {
+                    errorMessage = error.responseJSON.message;
+                }
+                
+                Swal.fire({
+                    title: 'Lỗi',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'Đóng'
+                });
+            }
+        });
+    });
+});
+</script>
+
+<!-- Thêm thư viện SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

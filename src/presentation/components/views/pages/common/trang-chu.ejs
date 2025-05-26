@@ -1,0 +1,952 @@
+<%- contentFor('body') %>
+<!-- Phần tìm kiếm -->
+<section class="py-4 bg-secondary bg-opacity-10">
+<div class="container">
+    <div class="mb-3">
+      <h5 class="mb-2">Tìm kiếm</h5>
+      <form id="search-form" action="/viec-lam" method="GET">
+        <div class="input-group">
+          <input type="text" class="form-control" id="search-input" name="keyword" placeholder="Tìm kiếm theo vị trí, công ty..." aria-label="Tìm kiếm">
+          <button class="btn btn-primary" type="submit" id="tim-kiem">
+            <i class="fas fa-search"></i> Tìm kiếm
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="d-flex flex-wrap align-items-center">
+      <span class="text-muted me-2 small">Bộ lọc tốt nhất:</span>
+      <div class="d-flex flex-wrap gap-1">
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="React">React</button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="Java">Java</button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="JavaScript">JavaScript</button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="UI/UX">UI/UX</button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="C#">C#</button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="DevOps">DevOps</button>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill filter-btn" data-keyword="Python">Python</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Công Ty Nổi Bật - Kiểu hiển thị mới -->
+<section class="py-4 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-primary text-center mb-0">Công Ty Nổi Bật</h3>
+    </div>
+    
+    <!-- Container có thể cuộn ngang với điều hướng -->
+    <div class="position-relative">
+      <!-- Mũi tên trái -->
+      <div class="position-absolute top-50 start-0 translate-middle-y" style="z-index: 10; left: -10px;">
+        <button class="btn btn-light rounded-circle shadow-sm" id="scrollLeftBtn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+    
+    <!-- Container có thể cuộn ngang -->
+    <div class="row flex-nowrap overflow-auto" id="featuredCompaniesContainer" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
+      <% if (typeof featuredCompanies !== 'undefined' && featuredCompanies.length > 0) { %>
+        <% featuredCompanies.forEach(function(company) { %>
+          <!-- Kiểm tra thông tin công ty -->
+          <% if (company && company.thongTin) { %>
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border">
+              <!-- Ảnh nền từ trường anh -->
+              <div class="position-relative" style="height: 160px; overflow: hidden;">
+                <img src="<%= (company.thongTin && company.thongTin.anh) ? company.thongTin.anh : (defaultBanner || '/images/kg_banner.jpg') %>" 
+                    alt="<%= (company.thongTin && company.thongTin.tenCongTy) ? company.thongTin.tenCongTy : 'Công ty' %>" 
+                    class="card-img-top w-100 h-100" 
+                    style="object-fit: cover;">
+                <div class="position-absolute" style="top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3);"></div>
+              </div>
+              
+              <div class="card-body">
+                <!-- Logo và tên công ty cùng hàng -->
+                <div class="d-flex align-items-center mb-3">
+                  <img src="<%= (company.thongTin && company.thongTin.logo) ? company.thongTin.logo : (defaultLogo || '/images/kg_logo.jpg') %>" 
+                      alt="<%= (company.thongTin && company.thongTin.tenCongTy) ? company.thongTin.tenCongTy : 'Logo' %>" 
+                      class="me-3" 
+                      style="width: 80px; height: 80px; object-fit: contain;">
+                  <div>
+                    <h5 class="mb-0"><%= (company.thongTin && company.thongTin.tenCongTy) ? company.thongTin.tenCongTy : 'Công ty' %></h5>
+                    <p class="text-muted small mb-0"><%= (company.thongTin && (company.thongTin.nganhNghe || company.thongTin.linhVuc)) ? (company.thongTin.nganhNghe || company.thongTin.linhVuc) : 'Chưa cập nhật' %></p>
+                  </div>
+                </div>
+                
+                <!-- Mô tả công ty -->
+                <p class="small mb-3">
+                  <% 
+                    let moTa = 'Chưa có mô tả công ty.';
+                    if (company.thongTin) {
+                      if (company.thongTin.moTa) moTa = company.thongTin.moTa;
+                      else if (company.thongTin.moTaCty) moTa = company.thongTin.moTaCty;
+                    }
+                    if (moTa && moTa.length > 100) moTa = moTa.substring(0, 100) + '...';
+                  %>
+                  <%= moTa %>
+                </p>
+                <div class="text-center">
+                  <a href="/chi-tiet-cong-ty/<%= company._id %>" class="btn btn-sm btn-outline-primary">Tìm hiểu thêm</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        <% }); %>
+      <% } else { %>
+        <!-- Hiển thị dữ liệu mẫu nếu không có công ty nào -->
+        <div class="col-md-4 mb-3">
+          <div class="card h-100 shadow-sm border">
+            <div class="position-relative" style="height: 160px; overflow: hidden;">
+              <img src="<%= defaultBanner || '/images/kg_banner.jpg' %>" 
+                  alt="Công ty mẫu" 
+                  class="card-img-top w-100 h-100" 
+                  style="object-fit: cover;">
+              <div class="position-absolute" style="top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3);"></div>
+            </div>
+            
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <img src="<%= defaultLogo || '/images/kg_logo.jpg' %>" 
+                    alt="K&G Technology" 
+                    class="me-3" 
+                    style="width: 80px; height: 80px; object-fit: contain;">
+                <div>
+                  <h5 class="mb-0">MB Bank</h5>
+                  <p class="text-muted small mb-0">Ngân hàng</p>
+                </div>
+              </div>
+              
+              <p class="small mb-3">MB là ngân hàng thương mại hàng đầu Việt Nam với dịch vụ tài chính đa dạng...</p>
+              <div class="text-center">
+                <a href="#" class="btn btn-sm btn-outline-primary">Tìm hiểu thêm</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    
+      <!-- Mũi tên phải -->
+      <div class="position-absolute top-50 end-0 translate-middle-y" style="z-index: 10; right: -10px;">
+        <button class="btn btn-light rounded-circle shadow-sm" id="scrollRightBtn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Indicators - đặt ở giữa -->
+    <div class="d-flex justify-content-center mt-3">
+      <button type="button" class="btn btn-sm btn-primary mx-1 active"></button>
+      <button type="button" class="btn btn-sm btn-outline-primary mx-1"></button>
+      <button type="button" class="btn btn-sm btn-outline-primary mx-1"></button>
+    </div>
+  </div>
+</section>
+    
+<!-- Nhà tuyển dụng nổi bật -->
+<section class="py-4 border-bottom">
+  <div class="container">
+    <h3 class="text-primary mb-4">Nhà Tuyển Dụng Nổi Bật</h3>
+    <div class="position-relative employer-logos">
+      <!-- Mũi tên trái -->
+      <div class="position-absolute top-50 start-0 translate-middle-y" style="z-index: 10; left: -10px;">
+        <button class="btn btn-light rounded-circle shadow-sm" id="prevEmployer">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <!-- Danh sách nhà tuyển dụng nổi bật - Lấy từ database -->
+      <div class="d-flex flex-nowrap justify-content-between align-items-center overflow-auto" id="employerLogosContainer" style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;">
+        <% if (typeof featuredEmployers !== 'undefined' && featuredEmployers.length > 0) { %>
+          <% featuredEmployers.forEach(function(employer) { %>
+            <% if (employer && employer.thongTin) { %>
+            <div class="mx-3 my-2">
+              <a href="/chi-tiet-cong-ty/<%= employer._id %>">
+                <img src="<%= (employer.thongTin && employer.thongTin.logo) ? employer.thongTin.logo : (defaultLogo || '/images/kg_logo.jpg') %>" 
+                     alt="<%= (employer.thongTin && employer.thongTin.tenCongTy) ? employer.thongTin.tenCongTy : 'Logo' %>" 
+                     height="60" 
+                     style="min-width: 150px; object-fit: contain;">
+              </a>
+            </div>
+            <% } %>
+          <% }); %>
+        <% } else { %>
+          <!-- Dữ liệu mặc định nếu không có nhà tuyển dụng nổi bật trong database -->
+        <div class="mx-3 my-2">
+            <img src="https://placehold.co/150x60/EEE/31343C?text=PRIME+TECH" alt="PRIME TECH" height="60">
+        </div>
+        <div class="mx-3 my-2">
+            <img src="https://placehold.co/150x60/EEE/31343C?text=MOTOROLA" alt="MOTOROLA" height="60">
+        </div>
+        <div class="mx-3 my-2">
+            <img src="https://placehold.co/150x60/EEE/31343C?text=ROADMAP+AI" alt="ROADMAP AI" height="60">
+        </div>
+        <div class="mx-3 my-2">
+          <img src="https://placehold.co/150x60/EEE/31343C?text=Sacombank" alt="Sacombank" height="60">
+        </div>
+        <div class="mx-3 my-2">
+          <img src="https://placehold.co/150x60/EEE/31343C?text=GEM" alt="GEM" height="60">
+        </div>
+        <div class="mx-3 my-2">
+          <img src="https://placehold.co/150x60/EEE/31343C?text=ACB" alt="ACB" height="60">
+        </div>
+        <% } %>
+      </div>
+      
+      <!-- Mũi tên phải -->
+      <div class="position-absolute top-50 end-0 translate-middle-y" style="z-index: 10; right: -10px;">
+        <button class="btn btn-light rounded-circle shadow-sm" id="nextEmployer">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Việc làm đã lưu -->
+<section class="py-4" style="background-color: #d5d5d5;">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-primary">Việc Làm Đã Lưu</h3>
+      <a href="/viec-lam-da-luu" class="text-decoration-none text-primary">XEM TẤT CẢ</a>
+    </div>
+    
+    <div class="row">
+      <% if (typeof savedJobs !== 'undefined' && savedJobs.length > 0) { %>
+        <% savedJobs.forEach(function(job) { %>
+          <% if (job) { %>
+          <div class="col-md-4 mb-3">
+            <div class="saved-job-item">
+              <div class="job-logo-bg">
+                <% 
+                  let logoUrl = 'https://placehold.co/150x60/EEE/31343C?text=Logo';
+                  if (job.nhaTuyenDung && job.nhaTuyenDung.thongTin && job.nhaTuyenDung.thongTin.logo) {
+                    logoUrl = job.nhaTuyenDung.thongTin.logo;
+                  }
+                %>
+                <img src="<%= logoUrl %>" alt="<%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Logo công ty' %>">
+              </div>
+              <div class="job-content">
+                <h5 class="job-title"><a href="/chi-tiet-cong-viec/<%= job._id %>" class="text-decoration-none text-dark"><%= job.tenCV %></a></h5>
+                <p class="company-name"><%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Chưa cập nhật' %></p>
+                <p class="job-location"><%= job.diaDiem || 'Chưa cập nhật' %></p>
+                <p class="job-salary text-primary"><%= job.luong ? (job.luong/1000000).toFixed(0) + ' triệu/tháng' : 'Thương lượng' %></p>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        <% }); %>
+      <% } else if (typeof user !== 'undefined' && user) { %>
+        <!-- Không có việc làm đã lưu -->
+        <div class="col-12 text-center py-5">
+          <div class="py-5">
+            <i class="far fa-bookmark fa-4x mb-3 text-muted"></i>
+            <h5 class="text-muted">Bạn chưa lưu công việc nào</h5>
+            <p class="text-muted">Hãy khám phá các công việc và lưu lại những công việc bạn quan tâm</p>
+            <a href="/viec-lam" class="btn btn-primary mt-2">Tìm việc làm ngay</a>
+          </div>
+        </div>
+      <% } else { %>
+        <!-- Dữ liệu mẫu nếu không đăng nhập hoặc không có dữ liệu -->
+        <div class="col-md-4 mb-3">
+          <div class="saved-job-item">
+            <div class="job-logo-bg">
+              <img src="https://placehold.co/150x60/EEE/31343C?text=Logo" alt="Personifeye">
+            </div>
+            <div class="job-content">
+              <h5 class="job-title">Nhân Viên Chăm Sóc Khách Hàng</h5>
+              <p class="company-name">Công Ty CP Thương Mại Và Tư Vấn</p>
+              <p class="salary-range">10tr-12tr đ/tháng</p>
+              <p class="job-location">Hà Nội</p>
+              <p class="job-salary text-primary">Thương lượng</p>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Công việc hot hôm nay -->
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="text-primary mb-0">🔥 Công Việc Hot Hôm Nay</h3>
+      <a href="/cong-viec-hot" class="text-decoration-none">Xem tất cả</a>
+    </div>
+    <div class="row">
+      <% if (typeof hotJobs !== 'undefined' && hotJobs.length > 0) { %>
+        <% hotJobs.forEach(function(job) { %>
+          <% if (job) { %>
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <% 
+                    let logoUrl = 'https://placehold.co/40x40/EEE/31343C?text=Logo';
+                    if (job.nhaTuyenDung && job.nhaTuyenDung.thongTin && job.nhaTuyenDung.thongTin.logo) {
+                      logoUrl = job.nhaTuyenDung.thongTin.logo;
+                    }
+                  %>
+                  <img src="<%= logoUrl %>" 
+                       alt="<%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Logo' %>" 
+                       height="40" style="object-fit: contain;">
+                  <% const maCV = job._id ? job._id.toString() : ''; %>
+                  <button class="btn btn-sm btn-outline-secondary border-0 btn-bookmark" 
+                           data-job-id="<%= maCV %>" 
+                           data-ma-cv="<%= maCV %>"
+                           onclick="console.log('DEBUG - Job ID từ onClick:', '<%= maCV %>');">
+                    <i class="<%= locals.user && locals.user.vaiTro === 'UngVien' && job.daLuu ? 'fas fa-heart text-danger' : 'far fa-bookmark' %>"></i>
+                    <span class="visually-hidden">Lưu việc làm</span>
+                  </button>
+                </div>
+                <h5 class="mt-3"><a href="/chi-tiet-cong-viec/<%= job._id %>" class="text-decoration-none text-dark"><%= job.tenCV %></a></h5>
+                <p class="text-muted small"><%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Chưa cập nhật' %></p>
+                <div class="d-flex flex-wrap mt-3 gap-1">
+                  <% if (job.kyNang && job.kyNang.length > 0) { %>
+                    <% job.kyNang.forEach(function(skill, index) { %>
+                      <% if (index < 5) { %>
+                        <span class="badge bg-light text-dark"><%= skill %></span>
+                      <% } %>
+                    <% }); %>
+                  <% } else { %>
+                    <span class="badge bg-light text-dark">Chưa cập nhật</span>
+                  <% } %>
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                  <span class="text-danger fw-bold"><%= job.luong ? (job.luong/1000000).toFixed(0) + ' triệu/tháng' : 'Thỏa thuận' %></span>
+                  <span class="text-muted small"><%= job.diaDiem || 'Chưa cập nhật' %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        <% }); %>
+      <% } else { %>
+        <!-- Hiển thị dữ liệu mẫu nếu không có công việc hot -->
+        <div class="col-md-4 mb-3">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <img src="https://placehold.co/40x40/EEE/31343C?text=Prime" alt="Prime Tech" height="40">
+                <button class="btn btn-sm btn-outline-secondary border-0"><i class="far fa-bookmark"></i></button>
+              </div>
+              <h5 class="mt-3">Senior Fullstack Developer</h5>
+              <p class="text-muted small">PRIME TECH SOLUTION COMPANY LIMITED</p>
+              <div class="d-flex flex-wrap mt-3 gap-1">
+                <span class="badge bg-light text-dark">Agile</span>
+                <span class="badge bg-light text-dark">Java</span>
+                <span class="badge bg-light text-dark">Full-Stack</span>
+                <span class="badge bg-light text-dark">DevOps</span>
+              </div>
+              <div class="d-flex flex-wrap mt-2 gap-1">
+                <span class="badge bg-light text-dark">ReactJS</span>
+                <span class="badge bg-light text-dark">Angular</span>
+                <span class="badge bg-light text-dark">Spring Boot</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    <div class="text-center mt-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1 active">1</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">2</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">3</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">4</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">5</button>
+    </div>
+  </div>
+</section>
+    </div>
+    <div class="text-center mt-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1 active">1</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">2</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">3</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">4</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">5</button>
+            </div>
+        </div>
+    </section>
+    
+<!-- Các công ty nổi bật -->
+<section class="py-4 bg-light">
+  <div class="container">
+    <h3 class="text-primary mb-4">Các Công Ty Nổi Bật</h3>
+    <div class="row">
+      <% if (typeof popularCompanies !== 'undefined' && popularCompanies.length > 0) { %>
+        <% popularCompanies.slice(0, 4).forEach(function(company) { %>
+          <% if (company && company.thongTin) { %>
+          <div class="col-md-3 mb-4">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <img src="<%= (company.thongTin && company.thongTin.logo) ? company.thongTin.logo : 'https://placehold.co/40x40/EEE/31343C?text=Logo' %>" height="40" alt="<%= (company.thongTin && company.thongTin.tenCongTy) ? company.thongTin.tenCongTy : 'Logo công ty' %>" style="object-fit: contain;">
+                  <button class="btn btn-sm btn-outline-secondary border-0"><i class="far fa-bookmark"></i></button>
+                </div>
+                <h5 class="mb-2"><a href="/chi-tiet-cong-ty/<%= company._id %>" class="text-decoration-none text-dark"><%= company.thongTin.tenCongTy || 'Công ty' %></a></h5>
+                <p class="text-muted small mb-2"><%= company.thongTin.nganhNghe || company.thongTin.linhVuc || 'Chưa cập nhật' %></p>
+                <div class="d-flex flex-wrap mt-3 gap-1">
+                  <span class="badge bg-light text-dark"><%= company.thongTin.quyMo || 'Quy mô công ty' %></span>
+                  <span class="badge bg-light text-dark"><%= company.thongTin.diaChi ? company.thongTin.diaChi.split(',')[0] : 'Việt Nam' %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        <% }); %>
+      <% } else { %>
+        <div class="col-md-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <img src="/images/kg_logo.jpg" height="40" alt="IT Support">
+                <button class="btn btn-sm btn-outline-secondary border-0"><i class="far fa-bookmark"></i></button>
+              </div>
+              <h5 class="mb-2">IT Support HN - Authentication (English - Open to Freshers)</h5>
+              <p class="text-muted small mb-2">AV VIETNAM CORPORATION</p>
+              <div class="d-flex flex-wrap mt-3 gap-1">
+                <span class="badge bg-light text-dark">IT Support</span>
+                <span class="badge bg-light text-dark">Technical Support</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Công việc mới nhất -->
+<section class="py-4 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="text-primary mb-0">Công Việc Mới Nhất</h3>
+      <a href="/cong-viec-moi" class="text-decoration-none text-danger">Xem tất cả</a>
+    </div>
+    <div class="row">
+      <% if (typeof latestJobs !== 'undefined' && latestJobs.length > 0) { %>
+        <% latestJobs.slice(0, 3).forEach(function(job) { %>
+          <% if (job) { %>
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <% 
+                    let logoUrl = 'https://placehold.co/40x40/EEE/31343C?text=Logo';
+                    if (job.nhaTuyenDung && job.nhaTuyenDung.thongTin && job.nhaTuyenDung.thongTin.logo) {
+                      logoUrl = job.nhaTuyenDung.thongTin.logo;
+                    }
+                  %>
+                  <img src="<%= logoUrl %>" 
+                       alt="<%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Logo công ty' %>" 
+                       class="me-2" 
+                       style="width: 40px; height: 40px; object-fit: contain;">
+                  <div>
+                    <h6 class="mb-0"><a href="/chi-tiet-cong-viec/<%= job._id %>" class="text-decoration-none text-dark"><%= job.tenCV %></a></h6>
+                    <small class="text-muted"><%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Chưa cập nhật' %></small>
+                  </div>
+                </div>
+                <div class="d-flex flex-wrap mt-2 gap-1">
+                  <% if (job.kyNang && job.kyNang.length > 0) { %>
+                    <% job.kyNang.slice(0, 4).forEach(function(skill) { %>
+                      <span class="badge bg-light text-dark"><%= skill %></span>
+                    <% }); %>
+                  <% } else { %>
+                    <span class="badge bg-light text-dark">Chưa cập nhật</span>
+                  <% } %>
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                  <span class="text-danger"><%= job.luong ? (job.luong/1000000).toFixed(0) + ' triệu/tháng' : 'Thỏa thuận' %></span>
+                  <span class="text-muted small"><%= job.diaDiem || 'Chưa cập nhật' %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        <% }); %>
+      <% } else { %>
+        <!-- Hiển thị dữ liệu mẫu nếu không có công việc nào -->
+        <div class="col-md-4 mb-3">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <img src="/images/kg_logo.jpg" alt="MB Bank" class="me-2" style="width: 40px; height: 40px; object-fit: contain;">
+                <div>
+                  <h6 class="mb-0">[Senior] Kỹ sư phát triển Mobile App</h6>
+                  <small class="text-muted">MB BANK</small>
+                </div>
+              </div>
+              <div class="d-flex flex-wrap mt-2 gap-1">
+                <span class="badge bg-light text-dark">Swift</span>
+                <span class="badge bg-light text-dark">Java</span>
+                <span class="badge bg-light text-dark">React Native</span>
+                <span class="badge bg-light text-dark">Kotlin</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    <div class="text-center mt-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1 active">1</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">2</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">3</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">4</button>
+    </div>
+  </div>
+</section>
+
+<!-- Việc làm gợi ý -->
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="text-primary mb-0">Việc Làm Gợi Ý</h3>
+      <a href="/viec-lam-goi-y" class="text-decoration-none text-danger">Xem tất cả</a>
+    </div>
+    <div class="row">
+      <% if (typeof suggestedJobs !== 'undefined' && suggestedJobs.length > 0 && typeof user !== 'undefined' && user) { %>
+        <% suggestedJobs.forEach(function(job) { %>
+          <% if (job) { %>
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm hover-shadow">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <% 
+                    let logoUrl = 'https://placehold.co/40x40/EEE/31343C?text=Logo';
+                    if (job.nhaTuyenDung && job.nhaTuyenDung.thongTin && job.nhaTuyenDung.thongTin.logo) {
+                      logoUrl = job.nhaTuyenDung.thongTin.logo;
+                    }
+                  %>
+                  <img src="<%= logoUrl %>" class="me-2" alt="<%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Logo công ty' %>" height="40" style="object-fit: contain;">
+                  <% if (job.ngayDang && new Date(job.ngayDang).getTime() > Date.now() - 3*24*60*60*1000) { %>
+                    <span class="badge bg-danger">Mới</span>
+                  <% } else if (job.isHot) { %>
+                    <span class="badge bg-warning text-dark">Nổi bật</span>
+                  <% } else { %>
+                    <span class="badge bg-primary">Phù hợp</span>
+                  <% } %>
+                </div>
+                <h5 class="mt-3"><a href="/chi-tiet-cong-viec/<%= job._id %>" class="text-decoration-none"><%= job.tenCV %></a></h5>
+                <p class="text-muted small"><%= job.nhaTuyenDung && job.nhaTuyenDung.thongTin ? job.nhaTuyenDung.thongTin.tenCongTy : 'Chưa cập nhật' %></p>
+                <div class="d-flex justify-content-between">
+                  <span class="text-danger fw-bold"><%= job.luong ? (job.luong/1000000).toFixed(0) + ' triệu' : 'Thỏa thuận' %></span>
+                  <span class="text-muted small"><%= job.diaDiem || 'Chưa cập nhật' %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        <% }); %>
+      <% } else { %>
+        <!-- Hiển thị hướng dẫn đăng nhập nếu chưa đăng nhập -->
+        <% if (!user) { %>
+          <div class="col-12 text-center py-5">
+            <div class="py-3">
+              <i class="fas fa-user-lock fa-4x mb-3 text-muted"></i>
+              <h5 class="text-muted">Bạn cần đăng nhập để xem việc làm gợi ý</h5>
+              <p class="text-muted">Chúng tôi sẽ gợi ý các công việc phù hợp dựa trên hồ sơ và kỹ năng của bạn</p>
+              <a href="/dang-nhap" class="btn btn-primary mt-2">Đăng nhập ngay</a>
+            </div>
+          </div>
+        <% } else { %>
+          <!-- Dữ liệu mẫu nếu đã đăng nhập nhưng không có gợi ý -->
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm hover-shadow">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <img src="/images/kg_logo.jpg" class="me-2" alt="FPT Retail" height="40">
+                  <span class="badge bg-danger">Mới</span>
+                </div>
+                <h5 class="mt-3"><a href="#" class="text-decoration-none">Chất lượng hệ thống - Công nghệ thông tin</a></h5>
+                <p class="text-muted small">Công ty Cổ phần Bán lẻ Kỹ thuật số FPT</p>
+                <div class="d-flex justify-content-between">
+                  <span class="text-danger fw-bold">15-20 triệu</span>
+                  <span class="text-muted small">Hà Nội</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+    <div class="text-center mt-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1 active">1</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">2</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">3</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary mx-1">4</button>
+    </div>
+  </div>
+</section>
+        </div>
+    </section>
+
+<%- contentFor('extraJS') %>
+<script>
+  // Đặt biến global vào đối tượng window
+  window.userLoggedIn = '<%= locals.user ? "true" : "false" %>';
+  window.userIsUngVien = '<%= locals.user && locals.user.vaiTro === "UngVien" ? "true" : "false" %>';
+  console.log('User Logged In:', window.userLoggedIn);
+  console.log('User Is UngVien:', window.userIsUngVien);
+  
+  $(document).ready(function() {
+    // Log thông tin khi trang được tải
+    console.log("=== TRANG CHỦ ĐÃ TẢI XONG ===");
+    
+    // Lấy giá trị từ thuộc tính data và đảm bảo chuyển đổi thành boolean
+    var userLoggedIn = $('body').data('user-logged-in') === true || $('body').data('user-logged-in') === "true";
+    var userIsUngVien = $('body').data('user-is-ungvien') === true || $('body').data('user-is-ungvien') === "true";
+    console.log('Body data attributes:', {
+      'user-logged-in': $('body').data('user-logged-in'),
+      'user-is-ungvien': $('body').data('user-is-ungvien')
+    });
+    
+    // In ra tất cả các nút bookmark để kiểm tra
+    $('.btn-bookmark').each(function(index) {
+      console.log(`Nút bookmark #${index}:`, {
+        'jobId': $(this).data('job-id'),
+        'html': $(this).html()
+      });
+    });
+    
+    // Xử lý các hình ảnh bị lỗi
+    $('img').on('error', function() {
+      // Kiểm tra nếu hình ảnh đã là placeholder thì không xử lý nữa để tránh vòng lặp vô hạn
+      if (!this.src.includes('placeholder')) {
+        if ($(this).width() > 60) {
+          // Ảnh lớn
+          this.src = '/images/placeholder.jpg';
+        } else {
+          // Logo hoặc ảnh nhỏ
+          this.src = '/images/kg_logo.jpg';
+        }
+      }
+    });
+
+    // Xử lý nút điều hướng cho phần công ty nổi bật
+    $('#scrollLeftBtn').on('click', function() {
+      $('#featuredCompaniesContainer').animate({
+        scrollLeft: '-=300'
+      }, 300);
+    });
+    
+    $('#scrollRightBtn').on('click', function() {
+      $('#featuredCompaniesContainer').animate({
+        scrollLeft: '+=300'
+      }, 300);
+    });
+    
+    // Xử lý nút điều hướng cho phần nhà tuyển dụng
+    $('#prevEmployer').on('click', function() {
+      // Xử lý cuộn danh sách logo công ty sang trái
+      $('.employer-logos .d-flex').animate({
+        scrollLeft: '-=300'
+      }, 300);
+    });
+    
+    $('#nextEmployer').on('click', function() {
+      // Xử lý cuộn danh sách logo công ty sang phải
+      $('.employer-logos .d-flex').animate({
+        scrollLeft: '+=300'
+      }, 300);
+    });
+
+    // Xử lý nút lưu công việc - sử dụng delegate để bắt event trên tất cả nút bookmark
+    $(document).on('click', '.btn-bookmark', function(event) {
+      event.preventDefault(); // Ngăn không cho browser xử lý mặc định
+      event.stopPropagation(); // Ngăn lan truyền
+      
+      // Hiển thị alert để xác nhận sự kiện đã được kích hoạt
+      // Thay thế alert bằng console.log trực tiếp
+      console.log("🔴 TRANG CHỦ: Nút bookmark được bấm vào lúc", new Date().toISOString());
+      
+      // Lấy ID công việc từ thuộc tính data-ma-cv (ưu tiên) hoặc data-job-id
+      // Thử cả attr() và data() vì đôi khi jQuery xử lý khác nhau
+      var maCV = $(this).attr('data-ma-cv') || $(this).attr('data-job-id');
+      if (!maCV) {
+        maCV = $(this).data('ma-cv') || $(this).data('job-id');
+      }
+      
+      console.log("🔴 TRANG CHỦ: maCV:", maCV);
+      console.log("🔴 TRANG CHỦ: Kiểu dữ liệu của maCV:", typeof maCV);
+      
+      // Lấy trực tiếp từ thuộc tính của element để kiểm tra xem dữ liệu có đúng không
+      var directAttr = this.getAttribute('data-ma-cv') || this.getAttribute('data-job-id');
+      console.log("🔴 TRANG CHỦ: Giá trị lấy trực tiếp từ getAttribute:", directAttr);
+      
+      // Nếu vẫn không có, thử đọc từ HTML trực tiếp
+      if (!maCV && !directAttr) {
+        var htmlContent = $(this).html();
+        console.log("🔴 TRANG CHỦ: HTML của nút:", htmlContent);
+        // Tìm kiếm ID trong các thuộc tính khác
+        var parentElement = $(this).closest('.job-item, .card');
+        var possibleId = parentElement.find('a[href*="/chi-tiet-cong-viec/"]').attr('href');
+        if (possibleId) {
+          possibleId = possibleId.split('/').pop();
+          console.log("🔴 TRANG CHỦ: ID tìm từ URL chi tiết:", possibleId);
+          maCV = possibleId;
+        }
+      }
+      
+      // Log tất cả các thuộc tính data của nút
+      var allData = $(this).data();
+      console.log("🔴 TRANG CHỦ: TẤT CẢ DATA ATTRIBUTES:", JSON.stringify(allData));
+      
+      // Kiểm tra lại giá trị maCV (ID công việc)
+      if (maCV === 'undefined' || maCV === '') {
+        console.error("maCV không hợp lệ");
+        alert("Không thể lưu việc làm này. ID công việc không hợp lệ!");
+        return;
+      }
+      var btn = $(this);
+      
+      if (!maCV) {
+        console.error("Không tìm thấy ID công việc (maCV)");
+        alert("Không thể lưu việc làm này. ID công việc không hợp lệ!");
+        return;
+      }
+      
+      // Lấy dữ liệu đăng nhập từ data attribute và chuyển thành boolean
+      var isLoggedIn = $('body').data('user-logged-in') === true || $('body').data('user-logged-in') === "true";
+      var isUngVien = $('body').data('user-is-ungvien') === true || $('body').data('user-is-ungvien') === "true";
+      
+      // Cách khác để kiểm tra đăng nhập từ biến toàn cục
+      isLoggedIn = isLoggedIn || (window.userLoggedIn === "true");
+      isUngVien = isUngVien || (window.userIsUngVien === "true");
+      
+      console.log("Trạng thái đăng nhập:", isLoggedIn, "Là ứng viên:", isUngVien);
+      console.log("Thông tin window.userLoggedIn:", window.userLoggedIn);
+      console.log("Thông tin window.userIsUngVien:", window.userIsUngVien);
+      console.log("Data từ body:", $('body').data());
+      
+      if (!isLoggedIn) {
+        window.location.href = '/dang-nhap?redirect=' + window.location.pathname;
+        return;
+      } else if (!isUngVien) {
+        alert('Chỉ tài khoản ứng viên mới có thể lưu việc làm!');
+        return;
+      }
+      
+      // Kiểm tra lại maCV trước khi gửi request
+      if (!maCV) {
+        console.error("Lỗi không có maCV");
+        alert("Lỗi: không có ID công việc!");
+        return;
+      }
+      
+      // Log chi tiết trước khi gửi request
+      console.log("Chuẩn bị gửi request AJAX với maCV:", maCV);
+      
+      // Thử kiểm tra và làm sạch maCV nếu cần
+      if (typeof maCV === 'string') {
+        // Loại bỏ các ký tự không cần thiết nếu có
+        maCV = maCV.trim();
+      }
+      
+      // Cố gắng chuyển đổi maCV thành ObjectId format nếu chưa đúng định dạng
+      if (maCV && typeof maCV === 'string' && !maCV.match(/^[0-9a-fA-F]{24}$/)) {
+        console.log("maCV không đúng định dạng MongoDB ObjectId, đang cố gắng chuẩn hóa");
+        // Nếu là một chuỗi JSON, thử parse
+        try {
+          const parsedValue = JSON.parse(maCV);
+          if (parsedValue && typeof parsedValue === 'string') {
+            maCV = parsedValue;
+          }
+        } catch (e) {
+          console.log("Không phải chuỗi JSON hợp lệ:", e);
+        }
+        console.log("Sau khi chuẩn hóa, maCV:", maCV);
+      }
+      
+      // Tạo dữ liệu đúng theo cấu trúc CSDL (maCV, maND)
+      const payload = { maCV: maCV };
+      console.log("DEBUG TRANG CHỦ - Dữ liệu sẽ gửi:", payload);
+      const jsonData = JSON.stringify(payload);
+      console.log("DEBUG TRANG CHỦ - Dữ liệu sau khi stringify:", jsonData);
+      
+      // Thêm log chi tiết khi bấm nút
+      console.log("DEBUG TRANG CHỦ - Bấm nút lưu việc làm yêu thích - timestamp:", new Date().toISOString());
+      
+      console.log("Đang gửi yêu cầu lưu công việc có ID:", maCV);
+      
+      // Kiểm tra cookie session
+      console.log("COOKIE SESSION:", document.cookie);
+      
+      // In ra payload cuối cùng để kiểm tra
+      console.log("PAYLOAD FINAL (DEBUG):", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include', // Đảm bảo cookie được gửi
+        body: jsonData
+      });
+
+      // Thay đổi API URL để khớp với route
+      var apiUrl = '/api/viec-yeu-thich';
+      console.log("API URL:" + apiUrl);
+
+      // Sử dụng form data thay vì JSON để xem có khắc phục được vấn đề không
+      var formData = new FormData();
+      formData.append('maCV', maCV);
+      
+      // Log form data
+      console.log("Form data created with maCV:", maCV);
+      
+      // Sử dụng fetch API với credentials: 'include'
+      console.log("🔵 BƯỚC 1: Bắt đầu gửi request fetch API với credentials: include");
+      console.log("🔵 BƯỚC 1: Thời gian:", new Date().toISOString());
+      console.log("🔵 BƯỚC 1: URL:", apiUrl);
+      console.log("🔵 BƯỚC 1: Method:", "POST");
+      console.log("🔵 BƯỚC 1: Headers:", {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      });
+      console.log("🔵 BƯỚC 1: Body:", jsonData);
+      console.log("🔵 BƯỚC 1: Credentials:", 'include');
+      
+      // Thêm timestamp để tránh cache
+      const timestampedUrl = apiUrl + '?t=' + new Date().getTime();
+      
+      fetch(timestampedUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        },
+        credentials: 'include', // Đảm bảo cookie được gửi đi
+        body: jsonData
+      })
+      .then(response => {
+        console.log("🔵 BƯỚC 2: Nhận được phản hồi từ server");
+        console.log("🔵 BƯỚC 2: Status:", response.status);
+        console.log("🔵 BƯỚC 2: Status Text:", response.statusText);
+        console.log("🔵 BƯỚC 2: Headers:", [...response.headers.entries()]);
+        console.log("🔵 BƯỚC 2: Type:", response.type);
+        console.log("🔵 BƯỚC 2: URL:", response.url);
+        console.log("🔵 BƯỚC 2: Response OK:", response.ok);
+        
+        if (response.ok) {
+          console.log("🔵 BƯỚC 3A: Phản hồi thành công, đang parse JSON");
+          return response.json();
+        }
+        
+        // Xử lý các lỗi HTTP
+        if (response.status === 401) {
+          console.log("🔵 BƯỚC 3B: Lỗi 401 - Chưa đăng nhập");
+          alert('Bạn cần đăng nhập để sử dụng chức năng này.');
+          window.location.href = '/dang-nhap?redirect=' + window.location.pathname;
+          throw new Error('Chưa đăng nhập');
+        } else if (response.status === 400) {
+          console.log("🔵 BƯỚC 3C: Lỗi 400 - Bad Request");
+          return response.text().then(text => {
+            console.log("🔵 BƯỚC 3C: Nội dung lỗi:", text);
+            if (text.includes('đã được lưu')) {
+              console.log("🔵 BƯỚC 3C: Công việc đã được lưu trước đó");
+              alert('Việc làm này đã được lưu trước đó');
+              btn.html('<i class="fas fa-heart text-danger"></i>');
+              btn.prop('disabled', true);
+            }
+            throw new Error(text);
+          });
+        }
+        
+        console.log("🔵 BƯỚC 3D: Lỗi server khác:", response.status);
+        throw new Error('Lỗi máy chủ ' + response.status);
+      })
+      .then(data => {
+        console.log("🔵 BƯỚC 4: Lưu công việc thành công");
+        console.log("🔵 BƯỚC 4: Dữ liệu phản hồi:", data);
+        console.log("🔵 BƯỚC 4: Thời gian:", new Date().toISOString());
+        
+        // Cập nhật giao diện
+        alert("Đã lưu công việc thành công!");
+        btn.html('<i class="fas fa-heart text-danger"></i>');
+        btn.prop('disabled', true);
+        
+        console.log("🔵 BƯỚC 5: Hoàn thành xử lý");
+      })
+      .catch(error => {
+        console.error("🔵 LỖI: Fetch API error:", error);
+        console.error("🔵 LỖI: Error message:", error.message);
+        console.error("🔵 LỖI: Error stack:", error.stack);
+        console.error("🔵 LỖI: Thời gian:", new Date().toISOString());
+        
+        // Nếu không phải lỗi đã xử lý ở trên, thử dùng AJAX
+        if (!error.message.includes('Chưa đăng nhập') && 
+            !error.message.includes('đã được lưu')) {
+          
+          console.log("🔵 BƯỚC PHỤC HỒI 1: Thử lại với jQuery AJAX khi fetch thất bại");
+          console.log("🔵 BƯỚC PHỤC HỒI 1: URL:", apiUrl);
+          console.log("🔵 BƯỚC PHỤC HỒI 1: Data:", jsonData);
+          
+          // Thêm timestamp để tránh cache
+          const ajaxUrl = apiUrl + '?t=' + new Date().getTime();
+          
+          $.ajax({
+            url: ajaxUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: jsonData,
+            xhrFields: {
+              withCredentials: true
+            },
+            crossDomain: false,
+            beforeSend: function(xhr) {
+              console.log("🔵 BƯỚC PHỤC HỒI 2: Gửi request AJAX");
+              console.log("🔵 BƯỚC PHỤC HỒI 2: Headers:", xhr.getAllResponseHeaders());
+              // Thêm các header để tránh cache
+              xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+              xhr.setRequestHeader('Pragma', 'no-cache');
+              xhr.setRequestHeader('Expires', '0');
+            },
+            success: function(data, textStatus, xhr) {
+              console.log("🔵 BƯỚC PHỤC HỒI 3: AJAX thành công");
+              console.log("🔵 BƯỚC PHỤC HỒI 3: Status:", textStatus);
+              console.log("🔵 BƯỚC PHỤC HỒI 3: Status code:", xhr.status);
+              console.log("🔵 BƯỚC PHỤC HỒI 3: Response:", data);
+              
+              alert("Đã lưu công việc thành công!");
+              btn.html('<i class="fas fa-heart text-danger"></i>');
+              btn.prop('disabled', true);
+            },
+            error: function(xhr, status, error) {
+              console.error("🔵 BƯỚC PHỤC HỒI LỖI: AJAX lỗi");
+              console.error("🔵 BƯỚC PHỤC HỒI LỖI: Status:", status);
+              console.error("🔵 BƯỚC PHỤC HỒI LỖI: Error:", error);
+              console.error("🔵 BƯỚC PHỤC HỒI LỖI: Status code:", xhr.status);
+              console.error("🔵 BƯỚC PHỤC HỒI LỖI: Status text:", xhr.statusText);
+              console.error("🔵 BƯỚC PHỤC HỒI LỖI: Response text:", xhr.responseText);
+              
+              // Thử phân tích phản hồi
+              try {
+                const responseObj = JSON.parse(xhr.responseText);
+                console.error("🔵 BƯỚC PHỤC HỒI LỖI: Parsed response:", responseObj);
+              } catch (e) {
+                console.error("🔵 BƯỚC PHỤC HỒI LỖI: Không thể parse JSON response");
+              }
+              
+              alert("Lỗi khi lưu công việc: " + (xhr.responseText || xhr.statusText || error));
+            }
+          });
+        }
+      });
+    });
+
+    // Xử lý khi người dùng nhấn vào các nút bộ lọc
+    $('.filter-btn').on('click', function() {
+      var keyword = $(this).data('keyword');
+      $('#search-input').val(keyword);
+      $('#search-form').submit();
+    });
+
+    console.log('Trang chủ đã được tải và khởi tạo thành công');
+  });
+</script>

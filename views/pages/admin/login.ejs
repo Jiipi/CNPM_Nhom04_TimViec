@@ -1,0 +1,125 @@
+<%- contentFor('body') %>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="modal-content p-0" style="max-width: 450px; width: 100%; margin: 40px auto;">
+        <div class="modal-header border-0 pb-0 d-flex justify-content-between">
+            <h5 class="modal-title">Đăng nhập quản trị viên</h5>
+            <a href="/" class="close" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </a>
+        </div>
+        <div class="modal-body px-4 pt-0 pb-4">
+            <div class="text-center mb-4">
+                <img src="/images/logo.jpg" alt="MY JOB Logo" class="logo mb-2" style="max-width: 120px;">
+                <h4 class="font-weight-bold">Quản trị hệ thống</h4>
+                <p class="text-muted">Đăng nhập với tư cách quản trị viên</p>
+            </div>
+            
+            <!-- Thông báo lỗi -->
+            <div class="alert alert-danger d-none" id="adminLoginError"></div>
+            
+            <form id="adminLoginForm" method="post" action="/api/admin/login-redirect">
+                <div class="mb-3">
+                    <label for="admin_tenDN" class="form-label">Tên đăng nhập</label>
+                    <input type="text" class="form-control" id="admin_tenDN" name="tenDN" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="admin_matKhau" class="form-label">Mật khẩu</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="admin_matKhau" name="matKhau" required>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#admin_matKhau">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Trường ẩn vai trò -->
+                <input type="hidden" name="vaiTro" value="QuanTriVien">
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('title') %>
+Đăng nhập quản trị viên | Hệ thống tuyển dụng
+
+<%- contentFor('extraJS') %>
+<script>
+  $(document).ready(function() {
+    console.log('Trang đăng nhập quản trị viên đã sẵn sàng!');
+    
+    // Xử lý hiển thị/ẩn mật khẩu
+    $('.toggle-password').on('click', function() {
+        const targetId = $(this).data('target');
+        const passwordInput = $(targetId);
+        const icon = $(this).find('i');
+        
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passwordInput.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    
+    // Xử lý submit form
+    $('#adminLoginForm').on('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = {
+        tenDN: $('#admin_tenDN').val(),
+        matKhau: $('#admin_matKhau').val(),
+        vaiTro: 'QuanTriVien'
+      };
+      
+      console.log('Đang đăng nhập quản trị viên với:', formData);
+      
+      $('#adminLoginError').addClass('d-none');
+      
+      // Trực tiếp sử dụng phương thức POST để chuyển hướng server
+      $.ajax({
+        url: '/api/admin/login-redirect',
+        type: 'POST',
+        data: formData,
+        success: function() {
+          console.log('Đăng nhập thành công, đang chuyển hướng từ server...');
+          // Hiển thị thông báo thành công
+          const alertEl = $('<div class="alert alert-success">').text('Đăng nhập thành công! Đang chuyển hướng...');
+          $('#adminLoginError').after(alertEl);
+          
+          // Đơn giản hóa phương thức chuyển hướng để tránh lỗi i18n
+          window.location.href = '/phe-duyet-viec-lam';
+        },
+        error: function(xhr) {
+          console.error('Lỗi đăng nhập quản trị viên:', xhr.status, xhr.responseJSON);
+          
+          let errorMsg = 'Đã xảy ra lỗi khi đăng nhập';
+          
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMsg = xhr.responseJSON.message;
+          } else if (xhr.status === 0) {
+            errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.';
+          } else if (xhr.status === 500) {
+            errorMsg = 'Lỗi máy chủ nội bộ. Vui lòng thử lại sau.';
+          } else if (xhr.status === 403) {
+            errorMsg = 'Tài khoản không có quyền truy cập vào trang quản trị.';
+          }
+          
+          $('#adminLoginError').text(errorMsg).removeClass('d-none');
+        }
+      });
+    });
+  });
+</script>
+
+<%- contentFor('extraCSS') %>
+<style>
+  .toggle-password {
+    cursor: pointer;
+  }
+</style>

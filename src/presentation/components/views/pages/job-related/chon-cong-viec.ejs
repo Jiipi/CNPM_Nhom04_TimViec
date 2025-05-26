@@ -1,0 +1,169 @@
+<%- contentFor('body') %>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Chọn công việc để ứng tuyển</h4>
+                </div>
+                <div class="card-body">
+                    <% if (typeof congViecList !== 'undefined' && congViecList.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Tên công việc</th>
+                                        <th>Công ty</th>
+                                        <th>Địa điểm</th>
+                                        <th>Mức lương</th>
+                                        <th>Hạn nộp hồ sơ</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% congViecList.forEach(congViec => { %>
+                                        <tr>
+                                            <td><a href="/chi-tiet-viec-lam/<%= congViec._id %>" class="text-primary font-weight-bold"><%= congViec.tenCV %></a></td>
+                                            <td>
+                                                <% if (congViec.maND && congViec.maND.tenCty) { %>
+                                                    <%= congViec.maND.tenCty %>
+                                                <% } else { %>
+                                                    Không có thông tin
+                                                <% } %>
+                                            </td>
+                                            <td><%= congViec.diaDiem %></td>
+                                            <td><%= congViec.luong || 'Thương lượng' %></td>
+                                            <td>
+                                                <% if (congViec.hanNopCV) { %>
+                                                    <%= new Date(congViec.hanNopCV).toLocaleDateString('vi-VN') %>
+                                                <% } else { %>
+                                                    Không xác định
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <a href="/ung-tuyen?congViecId=<%= congViec._id %>" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-paper-plane mr-1"></i> Ứng tuyển ngay
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Phân trang -->
+                        <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+                            <nav aria-label="Page navigation" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/chon-cong-viec?page=<%= currentPage - 1 %>" tabindex="-1">Trước</a>
+                                    </li>
+                                    <% for (let i = 1; i <= totalPages; i++) { %>
+                                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                            <a class="page-link" href="/chon-cong-viec?page=<%= i %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/chon-cong-viec?page=<%= currentPage + 1 %>">Sau</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <% } %>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <p class="mb-0">Không có công việc nào phù hợp với bạn hiện tại. Vui lòng quay lại sau.</p>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/viec-lam" class="btn btn-primary">
+                                <i class="fas fa-list mr-2"></i> Xem tất cả việc làm
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Tìm kiếm công việc</h5>
+                </div>
+                <div class="card-body">
+                    <form id="searchForm" action="/chon-cong-viec" method="GET">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="keyword">Từ khóa</label>
+                                    <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Nhập từ khóa tìm kiếm">
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-group">
+                                    <label for="location">Địa điểm</label>
+                                    <select class="form-control" id="location" name="location">
+                                        <option value="">Tất cả địa điểm</option>
+                                        <option value="hanoi">Hà Nội</option>
+                                        <option value="hcm">TP. Hồ Chí Minh</option>
+                                        <option value="danang">Đà Nẵng</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-group">
+                                    <label for="industry">Ngành nghề</label>
+                                    <select class="form-control" id="industry" name="industry">
+                                        <option value="">Tất cả ngành nghề</option>
+                                        <option value="it">CNTT - Phần mềm</option>
+                                        <option value="marketing">Marketing</option>
+                                        <option value="finance">Tài chính - Kế toán</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 mb-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-search mr-1"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        // Highlight các hàng khi di chuột qua
+        $('tbody tr').hover(
+            function() {
+                $(this).addClass('bg-light');
+            },
+            function() {
+                $(this).removeClass('bg-light');
+            }
+        );
+        
+        // Lấy các tham số từ URL để set giá trị cho form
+        const urlParams = new URLSearchParams(window.location.search);
+        const keyword = urlParams.get('keyword');
+        const location = urlParams.get('location');
+        const industry = urlParams.get('industry');
+        
+        if (keyword) $('#keyword').val(keyword);
+        if (location) $('#location').val(location);
+        if (industry) $('#industry').val(industry);
+    });
+</script>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    
+    .table-hover tbody tr:hover {
+        cursor: pointer;
+    }
+</style> 

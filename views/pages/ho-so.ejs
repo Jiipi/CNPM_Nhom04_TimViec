@@ -1,0 +1,306 @@
+<%- contentFor('body') %>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="position-relative d-inline-block mb-3">
+                        <% if (user && user.vaiTro === 'UngVien') { %>
+                            <img id="profileImage" src="<%= user.thongTin && user.thongTin.anhDaiDien ? user.thongTin.anhDaiDien : '/images/default-avatar.jpg' %>" alt="Ảnh đại diện" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        <% } else if (user && user.vaiTro === 'NhaTuyenDung') { %>
+                            <img id="profileImage" src="<%= user.thongTin && user.thongTin.logo ? user.thongTin.logo : '/images/default-company-logo.jpg' %>" alt="Logo công ty" style="width: 150px; height: 150px; object-fit: contain;">
+                        <% } %>
+                        <div class="position-absolute bottom-0 end-0">
+                            <label for="imageUpload" class="btn btn-sm btn-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="imageUpload" style="display: none" accept="image/*">
+                        </div>
+                    </div>
+                    <h5 class="card-title"><%= user ? user.hoTen : 'Người dùng' %></h5>
+                    <p class="text-muted"><%= user ? user.email : 'Email' %></p>
+                    <p class="badge <%= user && user.vaiTro === 'UngVien' ? 'bg-primary' : 'bg-success' %>">
+                        <%= user ? user.vaiTro === 'UngVien' ? 'Ứng viên' : 'Nhà tuyển dụng' : 'Chưa xác định' %>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="list-group mt-4">
+                <a href="/ho-so" class="list-group-item list-group-item-action active">Thông tin cá nhân</a>
+                <% if (user && user.vaiTro === 'UngVien') { %>
+                    <a href="/ho-so/cv" class="list-group-item list-group-item-action">CV của tôi</a>
+                    <a href="/hop-thu" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-envelope me-2"></i> Hộp thư
+                        </div>
+                        <% if (locals.soThongBaoChuaDoc && soThongBaoChuaDoc > 0) { %>
+                            <span class="badge bg-danger rounded-pill"><%= soThongBaoChuaDoc %></span>
+                        <% } %>
+                    </a>
+                    <a href="/ho-so/viec-yeu-thich" class="list-group-item list-group-item-action">Việc làm đã lưu</a>
+                    <a href="/ho-so/don-ung-tuyen" class="list-group-item list-group-item-action">Đơn ứng tuyển</a>
+                <% } else if (user && user.vaiTro === 'NhaTuyenDung') { %>
+                    <a href="/ho-so/cong-ty" class="list-group-item list-group-item-action">Thông tin công ty</a>
+                    <a href="/ho-so/viec-lam-da-dang" class="list-group-item list-group-item-action">Việc làm đã đăng</a>
+                    <a href="/ho-so/don-ung-tuyen" class="list-group-item list-group-item-action">Đơn ứng tuyển nhận được</a>
+                <% } %>
+                <a href="/dang-xuat" class="list-group-item list-group-item-action text-danger">Đăng xuất</a>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Thông tin cá nhân</h5>
+                </div>
+                <div class="card-body">
+                    <% if (user) { %>
+                        <form id="profileForm" data-role="<%= user.vaiTro %>">
+                            <div class="mb-3">
+                                <label for="hoTen" class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" id="hoTen" value="<%= user.hoTen %>" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" value="<%= user.email %>" readonly>
+                                <div class="form-text">Email không thể thay đổi.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="sdt" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="sdt" value="<%= user.sdt || '' %>" placeholder="Nhập số điện thoại">
+                            </div>
+                            
+                            <% if (user.vaiTro === 'UngVien') { %>
+                                <div class="mb-3">
+                                    <label for="diaChi" class="form-label">Địa chỉ</label>
+                                    <input type="text" class="form-control" id="diaChi" placeholder="Nhập địa chỉ">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="ngaySinh" class="form-label">Ngày sinh</label>
+                                    <input type="date" class="form-control" id="ngaySinh">
+                                </div>
+                            <% } else if (user.vaiTro === 'NhaTuyenDung') { %>
+                                <div class="mb-3">
+                                    <label for="tenCongTy" class="form-label">Tên công ty</label>
+                                    <input type="text" class="form-control" id="tenCongTy" value="<%= user.tenCty || '' %>" required>
+                                </div>
+                            <% } %>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                            </div>
+                        </form>
+                    <% } else { %>
+                        <p class="text-center">Vui lòng <a href="/dang-nhap">đăng nhập</a> để xem thông tin cá nhân.</p>
+                    <% } %>
+                </div>
+            </div>
+            
+            <% if (user && user.vaiTro === 'UngVien') { %>
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">Kỹ năng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="skills-container mb-3" id="skillsContainer">
+                            <!-- Kỹ năng sẽ được thêm vào đây bằng JavaScript -->
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Thêm kỹ năng mới" id="newSkill">
+                            <button class="btn btn-outline-primary" type="button" id="addSkill">Thêm</button>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (user && user.vaiTro === 'UngVien') { %>
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Thông báo gần đây</h5>
+                        <a href="/hop-thu" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                    </div>
+                    <div class="card-body">
+                        <% if (locals.thongBaoMoiNhat && thongBaoMoiNhat.length > 0) { %>
+                            <div class="list-group list-group-flush">
+                                <% thongBaoMoiNhat.forEach(function(tb) { %>
+                                    <a href="/chi-tiet-thong-bao/<%= tb._id %>" class="list-group-item list-group-item-action px-0 py-2 border-bottom">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 text-truncate" style="max-width: 70%;">
+                                                <% if (!tb.daDoc) { %><span class="text-danger me-1">●</span><% } %>
+                                                <%= tb.tieuDe %>
+                                            </h6>
+                                            <small><%= new Date(tb.ngayGui).toLocaleDateString('vi-VN') %></small>
+                                        </div>
+                                        <small class="text-muted text-truncate d-block">Từ: <%= tb.nguoiGui && tb.nguoiGui.thongTin && tb.nguoiGui.thongTin.tenCongTy ? tb.nguoiGui.thongTin.tenCongTy : (tb.nguoiGui ? tb.nguoiGui.hoTen : 'Không xác định') %></small>
+                                    </a>
+                                <% }); %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-muted text-center mb-0">Bạn chưa có thông báo nào.</p>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        // Lấy vai trò từ thuộc tính data-role của form
+        const userRole = $('#profileForm').data('role') || '';
+        
+        // Xử lý biểu mẫu hồ sơ
+        $('#profileForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const updatedInfo = {
+                hoTen: $('#hoTen').val().trim(),
+                sdt: $('#sdt').val().trim()
+            };
+            
+            if (userRole === 'UngVien') {
+                updatedInfo.diaChi = $('#diaChi').val().trim();
+                updatedInfo.ngaySinh = $('#ngaySinh').val();
+                // Nếu có ảnh đại diện đã tải lên
+                if (window.uploadedProfileImage) {
+                    updatedInfo.anhDaiDien = window.uploadedProfileImage;
+                }
+            } else if (userRole === 'NhaTuyenDung') {
+                updatedInfo.tenCongTy = $('#tenCongTy').val().trim();
+                // Nếu có logo đã tải lên
+                if (window.uploadedProfileImage) {
+                    updatedInfo.logo = window.uploadedProfileImage;
+                }
+            }
+            
+            // Kiểm tra dữ liệu trước khi gửi
+            if (!updatedInfo.hoTen) {
+                alert('Vui lòng nhập họ tên');
+                return;
+            }
+            
+            if (userRole === 'NhaTuyenDung') {
+                if (!updatedInfo.tenCongTy) {
+                    alert('Vui lòng nhập tên công ty');
+                    return;
+                }
+            }
+            
+            // AJAX request để cập nhật thông tin
+            $.ajax({
+                url: '/api/cap-nhat-ho-so',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedInfo),
+                success: function(response) {
+                    if (response.success) {
+                        alert('Cập nhật thông tin thành công!');
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Không thể cập nhật thông tin';
+                    alert('Đã xảy ra lỗi: ' + errorMsg);
+                }
+            });
+        });
+        
+        // Xử lý tải lên ảnh đại diện/logo
+        $('#imageUpload').on('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Kiểm tra file có phải là ảnh không
+            if (!file.type.match('image.*')) {
+                alert('Vui lòng chọn tệp hình ảnh');
+                return;
+            }
+            
+            // Kiểm tra kích thước file (giới hạn 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước ảnh không được vượt quá 5MB');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('profileImage', file);
+            
+            // Hiển thị loading
+            $('#profileImage').css('opacity', '0.5');
+            
+            // Gửi ảnh lên server
+            $.ajax({
+                url: '/api/upload-profile-image',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Cập nhật ảnh trên giao diện
+                        $('#profileImage').attr('src', response.imageUrl);
+                        // Lưu URL ảnh để cập nhật cùng thông tin hồ sơ
+                        window.uploadedProfileImage = response.imageUrl;
+                        alert('Tải ảnh lên thành công!');
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                    $('#profileImage').css('opacity', '1');
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON?.message || 'Không thể tải ảnh lên';
+                    alert('Đã xảy ra lỗi: ' + errorMsg);
+                    $('#profileImage').css('opacity', '1');
+                }
+            });
+        });
+        
+        // Chỉ khởi tạo kỹ năng cho ứng viên
+        if (userRole === 'UngVien') {
+            // Phần code xử lý kỹ năng giữ nguyên
+            const skills = [];
+            
+            function renderSkills() {
+                const container = $('#skillsContainer');
+                container.empty();
+                
+                if (skills.length === 0) {
+                    container.html('<p class="text-muted">Chưa có kỹ năng nào. Vui lòng thêm kỹ năng của bạn.</p>');
+                    return;
+                }
+                
+                skills.forEach(function(skill, index) {
+                    const skillBadge = $('<span class="badge bg-secondary me-2 mb-2 p-2"></span>').text(skill);
+                    const removeBtn = $('<i class="fas fa-times ms-1" style="cursor: pointer;"></i>');
+                    
+                    removeBtn.on('click', function() {
+                        skills.splice(index, 1);
+                        renderSkills();
+                    });
+                    
+                    skillBadge.append(removeBtn);
+                    container.append(skillBadge);
+                });
+            }
+            
+            $('#addSkill').on('click', function() {
+                const newSkill = $('#newSkill').val().trim();
+                if (newSkill && !skills.includes(newSkill)) {
+                    skills.push(newSkill);
+                    renderSkills();
+                    $('#newSkill').val('');
+                }
+            });
+            
+            renderSkills();
+        }
+    });
+</script> 

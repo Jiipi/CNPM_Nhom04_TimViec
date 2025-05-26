@@ -1,0 +1,367 @@
+<%- contentFor('body') %>
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/viec-lam">Danh sách công ty</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Thông tin công ty & tin tuyển dụng từ <%= nhaTuyenDung?.thongTin?.tenCongTy || nhaTuyenDung?.hoTen || 'Nhà tuyển dụng' %></li>
+        </ol>
+    </nav>
+
+    <!-- Company Header -->
+    <div class="company-header bg-light p-4 rounded">
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+                <img src="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.logo ? nhaTuyenDung.thongTin.logo : '/images/logo.jpg' %>" alt="<%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.tenCongTy ? nhaTuyenDung.thongTin.tenCongTy : nhaTuyenDung.hoTen %>" class="company-logo img-fluid">
+            </div>
+            <div class="col-md-10">
+                <h2 class="mb-2"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.tenCongTy ? nhaTuyenDung.thongTin.tenCongTy : nhaTuyenDung.hoTen %></h2>
+                <div class="company-details">
+                    <% if (nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.website) { %>
+                        <div class="mb-2">
+                            <i class="fas fa-globe text-primary mr-2"></i>
+                            <a href="<%= nhaTuyenDung.thongTin.website %>" target="_blank" class="text-primary"><%= nhaTuyenDung.thongTin.website %></a>
+                        </div>
+                    <% } %>
+                    <div class="d-flex mb-2">
+                        <div class="mr-4">
+                            <i class="fas fa-users text-secondary mr-2"></i> <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo ? nhaTuyenDung.thongTin.quyMo : '25-99' %> nhân viên
+                        </div>
+                        <div>
+                            <i class="fas fa-eye text-secondary mr-2"></i> <span>100 người theo dõi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Menu -->
+    <div class="company-tabs mt-4">
+        <ul class="nav nav-tabs" id="companyTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#gioithieu" role="tab" aria-controls="gioithieu" aria-selected="true">GIỚI THIỆU CÔNG TY</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="info-tab" data-toggle="tab" href="#thongtin" role="tab" aria-controls="thongtin" aria-selected="false">Thông tin công ty</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-lg-8">
+            <!-- Tab Content -->
+            <div class="tab-content" id="companyTabContent">
+                <!-- Giới thiệu tab -->
+                <div class="tab-pane fade show active bg-white p-4 rounded" id="gioithieu" role="tabpanel" aria-labelledby="home-tab">
+                    <% if (nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.moTa) { %>
+                        <div class="company-description"><%- nhaTuyenDung.thongTin.moTa %></div>
+                    <% } else { %>
+                        <p>Chưa có thông tin giới thiệu về công ty.</p>
+                    <% } %>
+
+                    <% if (nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.hinhAnh && nhaTuyenDung.thongTin.hinhAnh.length > 0) { %>
+                        <div class="company-gallery mt-4">
+                            <div class="row">
+                                <% nhaTuyenDung.thongTin.hinhAnh.forEach(function(image, index) { %>
+                                    <div class="col-md-6 mb-3">
+                                        <img src="<%= image %>" alt="<%= nhaTuyenDung.thongTin.tenCongTy %> Image <%= index+1 %>" class="img-fluid rounded">
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- Thông tin tab -->
+                <div class="tab-pane fade bg-white p-4 rounded" id="thongtin" role="tabpanel" aria-labelledby="info-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <div class="info-label"><i class="fas fa-map-marker-alt text-primary mr-2"></i> Địa điểm</div>
+                                <div class="info-value"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.diaChi ? nhaTuyenDung.thongTin.diaChi : 'Quận 1, Hồ Chí Minh' %></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <div class="info-label"><i class="fas fa-users text-primary mr-2"></i> Quy mô</div>
+                                <div class="info-value"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo ? nhaTuyenDung.thongTin.quyMo : '25-99' %> nhân viên</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <div class="info-label"><i class="fas fa-briefcase text-primary mr-2"></i> Ngành nghề</div>
+                                <div class="info-value"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.nganhNghe ? nhaTuyenDung.thongTin.nganhNghe : 'IT / Phần mềm' %></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <div class="info-label"><i class="fas fa-calendar-alt text-primary mr-2"></i> Thành lập</div>
+                                <div class="info-value"><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.namThanhLap ? nhaTuyenDung.thongTin.namThanhLap : '2003' %></div>
+                            </div>
+                        </div>
+                        <% if (nhaTuyenDung.email) { %>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <div class="info-label"><i class="fas fa-envelope text-primary mr-2"></i> Email</div>
+                                <div class="info-value"><%= nhaTuyenDung.email %></div>
+                            </div>
+                        </div>
+                        <% } %>
+                        <% if (nhaTuyenDung.sdt) { %>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <div class="info-label"><i class="fas fa-phone text-primary mr-2"></i> SĐT</div>
+                                <div class="info-value"><%= nhaTuyenDung.sdt %></div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tuyển dụng section -->
+            <div class="mt-4 mb-4">
+                <h4 class="section-title border-bottom pb-2 mb-3">TUYỂN DỤNG</h4>
+                <% if (congViec && congViec.length > 0) { %>
+                    <% congViec.forEach(function(job, index) { %>
+                        <div class="job-card card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="job-title mb-2">
+                                            <a href="/chi-tiet-viec-lam/<%= job._id %>" class="text-dark"><%= job.tenCV %></a>
+                                        </h5>
+                                        <div class="job-meta d-flex flex-wrap mb-2">
+                                            <span class="mr-3"><i class="fas fa-money-bill-wave text-success mr-1"></i> <%= job.luong ? job.luong.toLocaleString('vi-VN') + ' VNĐ' : 'Thỏa thuận' %></span>
+                                            <span class="mr-3"><i class="fas fa-map-marker-alt text-danger mr-1"></i> <%= job.diaDiem || 'Quận 1, Hồ Chí Minh' %></span>
+                                        </div>
+                                        <% if (job.kyNang && job.kyNang.length > 0) { %>
+                                            <div class="job-tags">
+                                                <% job.kyNang.slice(0, 3).forEach(skill => { %>
+                                                    <span class="badge badge-light mr-2"><%= skill %></span>
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-md-4 text-md-right">
+                                        <a href="/chi-tiet-viec-lam/<%= job._id %>" class="btn btn-primary mt-2">Ứng tuyển ngay</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="alert alert-info">
+                        Công ty chưa có tin tuyển dụng nào.
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Thông tin công ty sidebar -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thông tin công ty</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-map-marker-alt text-primary mr-2"></i> 
+                        <span><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.diaChi ? nhaTuyenDung.thongTin.diaChi : 'Quận 1, Hồ Chí Minh' %></span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-users text-primary mr-2"></i> 
+                        <span><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.quyMo ? nhaTuyenDung.thongTin.quyMo : '25-99' %> nhân viên</span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-briefcase text-primary mr-2"></i> 
+                        <span><%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.nganhNghe ? nhaTuyenDung.thongTin.nganhNghe : 'IT / Phần mềm' %></span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-alt text-primary mr-2"></i> 
+                        <span>Thành lập: <%= nhaTuyenDung.thongTin && nhaTuyenDung.thongTin.namThanhLap ? nhaTuyenDung.thongTin.namThanhLap : '2003' %></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Công ty tương tự -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Công ty tương tự</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-3">
+                            <div class="d-flex align-items-center">
+                                <img src="/images/fpt_logo.jpg" alt="FPT Software" class="mr-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-1">FPT Software</h6>
+                                    <small class="text-muted">IT / Phần mềm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-3">
+                            <div class="d-flex align-items-center">
+                                <img src="/images/cmc_logo.jpg" alt="CMC Global" class="mr-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-1">CMC Global</h6>
+                                    <small class="text-muted">IT / Phần mềm</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item p-3">
+                            <div class="d-flex align-items-center">
+                                <img src="/images/vng_logo.png" alt="NashTech" class="mr-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-1">VNG</h6>
+                                    <small class="text-muted">IT / Phần mềm</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .company-header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .company-logo {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #eee;
+    }
+    
+    .company-tabs .nav-tabs .nav-link {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .company-tabs .nav-tabs .nav-link.active {
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    .job-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    
+    .job-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .job-title a {
+        font-weight: 600;
+        text-decoration: none;
+        color: #343a40;
+    }
+    
+    .job-title a:hover {
+        color: #007bff;
+    }
+    
+    .job-meta {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .badge {
+        font-weight: normal;
+        padding: 5px 10px;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #495057;
+    }
+    
+    .info-value {
+        color: #6c757d;
+    }
+    
+    .company-info-section {
+        margin-bottom: 30px;
+    }
+    
+    .company-info-heading {
+        color: #264b82;
+        font-weight: 600;
+        padding: 10px 15px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        margin-bottom: 15px;
+    }
+    
+    .company-gallery {
+        margin: 20px 0;
+    }
+    
+    .company-gallery img {
+        border-radius: 4px;
+        margin-bottom: 15px;
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    .job-listing {
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    
+    .job-listing:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .breadcrumb {
+        background-color: transparent;
+        padding-left: 0;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+    }
+    
+    .text-warning {
+        color: #fd7e14 !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 5px 10px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+</style>
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        // Xử lý các tương tác trong trang
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>

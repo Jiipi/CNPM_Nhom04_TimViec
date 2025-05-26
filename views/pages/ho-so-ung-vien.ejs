@@ -1,0 +1,155 @@
+<%- contentFor('title') %><%= congViec ? `Hồ sơ ứng viên - ${congViec.tenCV}` : 'Hồ sơ ứng viên' %>
+
+<%- contentFor('body') %>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 bg-light p-0">
+            <%- include('../partials/sidebar-nha-tuyen-dung') %>
+        </div>
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="bg-light-subtle p-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/quan-ly-cong-viec">Quản lý công việc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Hồ sơ ứng viên</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="bg-white p-4 mb-4">
+                <!-- Thông tin công việc -->
+                <div class="bg-light-subtle p-3 mb-4 rounded">
+                    <% if (congViec) { %>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="h4 mb-2">HỒ SƠ ỨNG VIÊN</h2>
+                            <a href="/quan-ly-cong-viec" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                            </a>
+                        </div>
+                        <div class="job-info mt-2">
+                            <p class="mb-0"><strong>Vị trí công việc:</strong> <%= congViec.tenCV %></p>
+                            <p class="mb-0"><strong>Tổng hồ sơ:</strong> <%= totalUngVien %></p>
+                        </div>
+                    <% } %>
+                </div>
+
+                <% if (danhSachUngVien && danhSachUngVien.length > 0) { %>
+                <div class="row">
+                    <% danhSachUngVien.forEach((ungVien, index) => { %>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0"><%= ungVien.hoTen %></h5>
+                                <span class="badge badge-<%= 
+                                    ungVien.ketQua === 'Đạt' ? 'success' : 
+                                    (ungVien.ketQua === 'Không đạt' ? 'danger' : 'warning') 
+                                %>">
+                                    <%= ungVien.ketQua || 'Đang đánh giá' %>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p><i class="fas fa-envelope mr-2"></i> <%= ungVien.email %></p>
+                                        <p><i class="fas fa-phone mr-2"></i> <%= ungVien.sdt %></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><i class="fas fa-calendar mr-2"></i> Ứng tuyển: <%= new Date(ungVien.ngayUngTuyen).toLocaleDateString('vi-VN') %></p>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Kỹ năng:</h6>
+                                    <div>
+                                        <% if (ungVien.kyNang && ungVien.kyNang.length > 0) { %>
+                                            <% ungVien.kyNang.forEach(skill => { %>
+                                                <span class="badge badge-info mr-1 mb-1"><%= skill %></span>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <p class="text-muted small">Chưa cập nhật kỹ năng</p>
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Mô tả:</h6>
+                                    <p class="text-muted small"><%= ungVien.moTa %></p>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white d-flex justify-content-between">
+                                <% console.log('---- DEBUG ỨNG VIÊN TRONG VÒNG LẶP ----') %>
+                                <% console.log('Loại của ungVien:', typeof ungVien) %>
+                                <% console.log('Ứng viên trong vòng lặp:', ungVien); %>
+                                <% console.log('ID ứng viên:', ungVien._id ? ungVien._id.toString() : 'Không có ID'); %>
+                                <% console.log('Kiểm tra các thuộc tính:') %>
+                                <% console.log('- maND:', ungVien.maND) %>
+                                <% console.log('- donUngTuyen:', ungVien.donUngTuyen && ungVien.donUngTuyen.length) %>
+                                <% console.log('- congViec:', congViec._id) %>
+                                <% console.log('- donUngTuyenId:', ungVien.donUngTuyenId) %>
+                                
+                                <!-- Hiển thị thông tin debug để xác định ID đúng -->
+                                <div class="debug-info d-none">
+                                  <p>ID ứng viên: <%= ungVien._id %></p>
+                                  <p>ID đơn ứng tuyển: <%= ungVien.donUngTuyenId || 'Không có' %></p>
+                                  <p>ID công việc: <%= congViec._id %></p>
+                                </div>
+                                
+                                <!-- Đảm bảo ID ứng viên là hợp lệ -->
+                                <% if (ungVien && ungVien._id && ungVien.donUngTuyenId) { %>
+                                <!-- Sử dụng ID của đơn ứng tuyển để xác định chính xác -->
+                                <a href="/xem-cv/<%= ungVien._id %>?donUngTuyenId=<%= ungVien.donUngTuyenId %>&congViecId=<%= congViec._id %>" class="btn btn-primary">
+                                    <i class="fas fa-file-alt mr-1"></i> Xem CV
+                                </a>
+                                <% } else if (ungVien && ungVien._id) { %>
+                                <a href="/xem-cv/<%= ungVien._id %>?congViecId=<%= congViec._id %>" class="btn btn-primary">
+                                    <i class="fas fa-file-alt mr-1"></i> Xem CV
+                                </a>
+                                <% } else { %>
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-file-alt mr-1"></i> Không có CV
+                                </button>
+                                <% } %>
+                                
+                                <a href="/gui-thong-bao/<%= ungVien._id %>?congViecId=<%= congViec._id %>" class="btn btn-outline-info">
+                                    <i class="fas fa-envelope mr-1"></i> Gửi thông báo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <% } else { %>
+                <div class="alert alert-info text-center py-5">
+                    <i class="fas fa-user-tie fa-3x mb-3"></i>
+                    <h4>Chưa có ứng viên nào ứng tuyển cho công việc này</h4>
+                    <p class="mb-0">Bạn có thể chờ đợi hoặc quảng bá công việc của mình để thu hút thêm ứng viên.</p>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraJS') %>
+<script>
+$(document).ready(function() {
+    console.log('Trang hồ sơ ứng viên đã sẵn sàng');
+});
+</script>
+
+<%- contentFor('extraCSS') %>
+<style>
+.card {
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.badge {
+    padding: 0.5em 0.8em;
+    font-size: 80%;
+}
+</style> 

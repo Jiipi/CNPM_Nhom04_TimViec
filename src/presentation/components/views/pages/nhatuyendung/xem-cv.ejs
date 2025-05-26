@@ -1,0 +1,312 @@
+<%- contentFor('title') %>CV - <%= ungVien.hoTen %>
+
+<%- contentFor('body') %>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2 bg-light p-0">
+            <%- include('../partials/sidebar-nha-tuyen-dung') %>
+        </div>
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="bg-light-subtle p-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="/quan-ly-cong-viec">Quản lý công việc</a></li>
+                        <% if (congViec && congViec._id) { %>
+                        <li class="breadcrumb-item"><a href="/xem-ho-so-ung-vien/<%= congViec._id %>">Hồ sơ ứng viên</a></li>
+                        <% } else { %>
+                        <li class="breadcrumb-item"><a href="/danh-sach-ung-vien">Danh sách ứng viên</a></li>
+                        <% } %>
+                        <li class="breadcrumb-item active" aria-current="page">Xem CV</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <% if (typeof chuaUngTuyen !== 'undefined' && chuaUngTuyen) { %>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <strong>Lưu ý:</strong> Ứng viên này chưa ứng tuyển vào bất kỳ công việc nào. Bạn chỉ có thể xem thông tin cơ bản.
+            </div>
+            <% } %>
+            
+            <% if (typeof khongCoQuyen !== 'undefined' && khongCoQuyen) { %>
+            <div class="alert alert-danger">
+                <i class="fas fa-lock mr-2"></i>
+                <strong>Truy cập bị từ chối:</strong> Bạn không có quyền xem đầy đủ thông tin CV của ứng viên này vì họ chưa ứng tuyển vào công việc của bạn.
+                <% if (typeof nhaTuyenDungInfo !== 'undefined' && nhaTuyenDungInfo) { %>
+                <p class="mt-2 mb-0">Ứng viên này đã ứng tuyển vào công việc của <strong><%= nhaTuyenDungInfo.thongTin?.tenCongTy || nhaTuyenDungInfo.hoTen %></strong>.</p>
+                <% } %>
+            </div>
+            <% } %>
+            
+            <% if (typeof congViecKhongTonTai !== 'undefined' && congViecKhongTonTai) { %>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <strong>Lưu ý:</strong> Công việc mà ứng viên này đã ứng tuyển không còn tồn tại trong hệ thống.
+            </div>
+            <% } %>
+
+            <div class="bg-white p-4 mb-4 rounded shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>CV - <%= ungVien.hoTen %></h2>
+                    <div>
+                        <% if (congViec && congViec._id) { %>
+                        <a href="/xem-ho-so-ung-vien/<%= congViec._id %>" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                        </a>
+                        <% } else { %>
+                        <a href="/danh-sach-ung-vien" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                        </a>
+                        <% } %>
+                        
+                        <% if (donUngTuyen && donUngTuyen.fileCV) { %>
+                        <a href="<%= donUngTuyen.fileCV %>" class="btn btn-primary ml-2" download>
+                            <i class="fas fa-download mr-1"></i> Tải CV
+                        </a>
+                        <% } else if (ungVien.cv) { %>
+                        <a href="<%= ungVien.cv %>" class="btn btn-primary ml-2" download>
+                            <i class="fas fa-download mr-1"></i> Tải CV
+                        </a>
+                        <% } %>
+                        
+                        <% if (congViec && congViec._id && typeof khongCoQuyen !== 'undefined' && !khongCoQuyen) { %>
+                        <a href="/gui-thong-bao/<%= ungVien._id %>?congViecId=<%= congViec._id %>" class="btn btn-info ml-2">
+                            <i class="fas fa-envelope mr-1"></i> Gửi thông báo
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Thông tin ứng viên -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Thông tin cá nhân</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                <img src="<%= ungVien.anhDaiDien || '/images/avatar-placeholder.jpg' %>" alt="<%= ungVien.hoTen %>" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+                            <div class="col-md-8">
+                                <h3><%= ungVien.hoTen %></h3>
+                                <% if (congViec) { %>
+                                <p class="text-muted mb-2"><i class="fas fa-briefcase mr-2"></i> Ứng viên cho vị trí: <%= congViec.tenCV %></p>
+                                <% } else { %>
+                                <p class="text-muted mb-2"><i class="fas fa-briefcase mr-2"></i> Ứng viên</p>
+                                <% } %>
+                                
+                                <div class="mt-3">
+                                    <p><strong><i class="fas fa-envelope mr-2"></i> Email:</strong> <%= ungVien.email %></p>
+                                    <p><strong><i class="fas fa-phone mr-2"></i> Số điện thoại:</strong> <%= ungVien.sdt %></p>
+                                    <p><strong><i class="fas fa-map-marker-alt mr-2"></i> Địa chỉ:</strong> <%= ungVien.diaChi || 'Chưa cập nhật' %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kỹ năng -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Kỹ năng</h4>
+                    </div>
+                    <div class="card-body">
+                        <% if (ungVien.kyNang && ungVien.kyNang.length > 0) { %>
+                            <div class="row">
+                                <% ungVien.kyNang.forEach(skill => { %>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 bg-light-subtle rounded">
+                                            <span class="badge badge-info mr-2"><i class="fas fa-code"></i></span>
+                                            <%= skill %>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-muted">Chưa cập nhật thông tin kỹ năng</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Kinh nghiệm -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Kinh nghiệm làm việc</h4>
+                    </div>
+                    <div class="card-body">
+                        <% if (ungVien.kinhNghiem && ungVien.kinhNghiem.length > 0) { %>
+                            <% ungVien.kinhNghiem.forEach(exp => { %>
+                                <div class="mb-4">
+                                    <h5><%= exp.viTri || 'Không có tiêu đề' %></h5>
+                                    <h6 class="text-muted"><%= exp.congTy || 'Không có tên công ty' %></h6>
+                                    <p class="text-muted small">
+                                        <% if (exp.thoiGianBatDau && exp.thoiGianKetThuc) { %>
+                                            <%= new Date(exp.thoiGianBatDau).toLocaleDateString('vi-VN') %> - 
+                                            <%= new Date(exp.thoiGianKetThuc).toLocaleDateString('vi-VN') %>
+                                        <% } else { %>
+                                            Chưa cập nhật thời gian
+                                        <% } %>
+                                    </p>
+                                    <p><%= exp.moTa || 'Chưa có mô tả' %></p>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-muted">Chưa cập nhật thông tin kinh nghiệm</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Học vấn -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Học vấn</h4>
+                    </div>
+                    <div class="card-body">
+                        <% if (ungVien.hocVan && ungVien.hocVan.length > 0) { %>
+                            <% ungVien.hocVan.forEach(edu => { %>
+                                <div class="mb-4">
+                                    <h5><%= edu.truong || 'Không có tên trường' %></h5>
+                                    <h6 class="text-muted"><%= edu.chuyenNganh || 'Không có chuyên ngành' %></h6>
+                                    <p class="text-muted small">
+                                        <% if (edu.thoiGianBatDau && edu.thoiGianKetThuc) { %>
+                                            <%= new Date(edu.thoiGianBatDau).toLocaleDateString('vi-VN') %> - 
+                                            <%= new Date(edu.thoiGianKetThuc).toLocaleDateString('vi-VN') %>
+                                        <% } else { %>
+                                            Chưa cập nhật thời gian
+                                        <% } %>
+                                    </p>
+                                    <p><%= edu.moTa || 'Chưa có mô tả' %></p>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-muted">Chưa cập nhật thông tin học vấn</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- CV File - Đã ẩn -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Thông tin CV</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <% if (donUngTuyen && donUngTuyen.fileCV || ungVien.cv) { %>
+                        <p>Ứng viên có đính kèm CV. Vui lòng sử dụng nút tải CV ở trên để xem.</p>
+                        <% } else { %>
+                        <p class="text-muted">Ứng viên chưa đính kèm file CV</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Đánh giá ứng viên -->
+                <% if (congViec && donUngTuyen && typeof khongCoQuyen !== 'undefined' && !khongCoQuyen && typeof chuaUngTuyen !== 'undefined' && !chuaUngTuyen) { %>
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Đánh giá ứng viên</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="danhGiaForm" action="/api/don-ung-tuyen/danh-gia" method="POST">
+                            <input type="hidden" name="ungVienId" value="<%= ungVien._id %>">
+                            <input type="hidden" name="congViecId" value="<%= congViec._id %>">
+                            
+                            <div class="form-group">
+                                <label for="ketQua">Kết quả đánh giá</label>
+                                <select class="form-control" id="ketQua" name="ketQua" required>
+                                    <option value="">-- Chọn kết quả --</option>
+                                    <option value="Đạt yêu cầu" <%= donUngTuyen.ketQua === 'Đạt yêu cầu' ? 'selected' : '' %>>Đạt yêu cầu</option>
+                                    <option value="Không đạt" <%= donUngTuyen.ketQua === 'Không đạt' ? 'selected' : '' %>>Không đạt</option>
+                                    <option value="Cần phỏng vấn thêm" <%= donUngTuyen.ketQua === 'Cần phỏng vấn thêm' ? 'selected' : '' %>>Cần phỏng vấn thêm</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ghiChu">Ghi chú đánh giá</label>
+                                <textarea class="form-control" id="ghiChu" name="ghiChu" rows="3"><%= donUngTuyen.ghiChu || '' %></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Lưu đánh giá</button>
+                        </form>
+                    </div>
+                </div>
+                <% } else if ((typeof khongCoQuyen !== 'undefined' && khongCoQuyen) || (typeof chuaUngTuyen !== 'undefined' && chuaUngTuyen)) { %>
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h4 class="card-title mb-0">Đánh giá ứng viên</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <% if (typeof chuaUngTuyen !== 'undefined' && chuaUngTuyen) { %>
+                            <i class="fas fa-info-circle mr-2"></i> Ứng viên chưa ứng tuyển vào bất kỳ công việc nào.
+                            <% } else if (typeof khongCoQuyen !== 'undefined' && khongCoQuyen) { %>
+                            <i class="fas fa-info-circle mr-2"></i> Bạn không có quyền đánh giá ứng viên này vì họ chưa ứng tuyển vào công việc của bạn.
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('extraJS') %>
+<!-- Lưu dữ liệu EJS vào biến data-* để tránh xung đột cú pháp -->
+<div id="ejs-data" 
+    data-enable-form="<%= (typeof congViec !== 'undefined' && typeof donUngTuyen !== 'undefined' && typeof khongCoQuyen !== 'undefined' && !khongCoQuyen && typeof chuaUngTuyen !== 'undefined' && !chuaUngTuyen) ? 'true' : 'false' %>"
+    style="display: none;">
+</div>
+
+<script>
+// JavaScript thuần túy không có EJS
+$(document).ready(function() {
+    // Đọc cấu hình từ thuộc tính data
+    var enableForm = $('#ejs-data').data('enable-form') === 'true';
+    
+    // Xử lý form đánh giá
+    if (enableForm) {
+        $('#danhGiaForm').submit(function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/api/don-ung-tuyen/danh-gia',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        alert('Đánh giá ứng viên thành công!');
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        alert('Lỗi: ' + (response.message || error));
+                    } catch (e) {
+                        alert('Đã xảy ra lỗi khi gửi đánh giá.');
+                    }
+                }
+            });
+        });
+    }
+});
+</script>
+
+<%- contentFor('extraCSS') %>
+<style>
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.badge {
+    padding: 0.5em 0.8em;
+    font-size: 85%;
+}
+</style> 

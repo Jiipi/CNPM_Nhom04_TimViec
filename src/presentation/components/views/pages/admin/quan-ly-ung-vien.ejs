@@ -1,0 +1,76 @@
+<%- contentFor('body') %>
+
+<div class="container-fluid my-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h1 class="h3 mb-0">Quản lý ứng viên</h1>
+        </div>
+        <div class="card-body">
+          <% if (danhSachUngVien && danhSachUngVien.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">STT</th>
+                    <th scope="col">Họ tên</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Số điện thoại</th>
+                    <th scope="col">Địa chỉ</th>
+                    <th scope="col">Kỹ năng</th>
+                    <th scope="col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% danhSachUngVien.forEach((ungVien, index) => { %>
+                    <tr>
+                      <td><%= index + 1 %></td>
+                      <td><%= ungVien.hoTen %></td>
+                      <td><%= ungVien.email %></td>
+                      <td><%= ungVien.sdt %></td>
+                      <td><%= ungVien.diaChi %></td>
+                      <td>
+                        <% if (ungVien.kyNang && ungVien.kyNang.length > 0) { %>
+                          <% ungVien.kyNang.slice(0, 3).forEach(kyNang => { %>
+                            <span class="badge bg-info text-dark me-1"><%= kyNang %></span>
+                          <% }) %>
+                          <% if (ungVien.kyNang.length > 3) { %>
+                            <span class="badge bg-secondary">+<%= ungVien.kyNang.length - 3 %></span>
+                          <% } %>
+                        <% } else { %>
+                          <span class="text-muted">Chưa cập nhật</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <div class="btn-group" role="group">
+                          <a href="/chi-tiet-ung-vien/<%= ungVien._id %>" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i> Xem
+                          </a>
+                          <a href="/ung-vien-cv/<%= ungVien._id %>" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-file-alt"></i> CV
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i> Chưa có ứng viên nào trong hệ thống.
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- contentFor('extraCSS') %>
+<style>
+    .candidate-item:hover {
+        background-color: #f8f9fa;
+    }
+</style> 

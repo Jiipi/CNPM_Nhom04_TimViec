@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Hộp thư của tôi - Hệ Thống Tuyển Dụng' %></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .unread {
+        border-left: 4px solid #007bff;
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    .list-group-item {
+        transition: all 0.2s ease;
+    }
+    
+    .list-group-item:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <section class="mailbox-section py-4">
+      <div class="container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="card">
+                      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                          <h3 class="mb-0">Hộp thư của tôi</h3>
+                          <span class="badge badge-primary badge-pill">
+                              <% if (locals.thongBao && locals.thongBao.length > 0) { %>
+                                  <%= thongBao.length %> tin nhắn
+                              <% } else { %>
+                                  0 tin nhắn
+                              <% } %>
+                          </span>
+                      </div>
+                      <div class="card-body">
+                          <% if (locals.thongBao && thongBao.length > 0) { %>
+                              <div class="list-group">
+                                  <% thongBao.forEach(function(tb) { %>
+                                      <div class="list-group-item list-group-item-action <%= tb.daDoc ? '' : 'unread' %>">
+                                          <div class="d-flex w-100 justify-content-between">
+                                              <h5 class="mb-1">
+                                                  <% if (!tb.daDoc) { %><span class="badge badge-danger mr-2">Mới</span><% } %>
+                                                  <%= tb.tieuDe %>
+                                              </h5>
+                                              <small><%= new Date(tb.ngayTao).toLocaleDateString('vi-VN') %></small>
+                                          </div>
+                                          <div class="d-flex w-100 justify-content-between align-items-center">
+                                              <p class="mb-1 text-muted">
+                                                Từ: 
+                                                <% if (tb.nguoiTao && tb.nguoiTao.thongTin && tb.nguoiTao.thongTin.tenCongTy) { %>
+                                                  <%= tb.nguoiTao.thongTin.tenCongTy %>
+                                                <% } else if (tb.nguoiTao && tb.nguoiTao.hoTen) { %>
+                                                  <%= tb.nguoiTao.hoTen %>
+                                                <% } else { %>
+                                                  Không xác định
+                                                <% } %>
+                                              </p>
+                                              <a href="/chi-tiet-thong-bao/<%= tb._id %>" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
+                                          </div>
+                                          <small class="text-truncate d-block" style="max-width: 90%"><%= tb.noiDung %></small>
+                                      </div>
+                                  <% }); %>
+                              </div>
+                          <% } else { %>
+                              <div class="text-center py-5">
+                                  <i class="fas fa-envelope-open fa-4x text-muted mb-3"></i>
+                                  <h4 class="text-muted">Hộp thư trống</h4>
+                                  <p class="text-muted">Bạn chưa nhận được thông báo nào từ nhà tuyển dụng</p>
+                              </div>
+                          <% } %>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          // JavaScript có thể được thêm vào đây nếu cần
+      });
+  </script>
+</body>
+</html> 

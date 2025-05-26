@@ -1,0 +1,108 @@
+<%- contentFor('body') %>
+<section class="send-message-section py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Gửi thông báo cho ứng viên</h3>
+                        <% if (locals.ungVien) { %>
+                            <span class="badge badge-primary">Gửi cho: <%= ungVien.hoTen %></span>
+                        <% } %>
+                    </div>
+                    <div class="card-body">
+                        <form id="sendMessageForm" action="/gui-thong-bao" method="POST">
+                            <% if (locals.ungVien) { %>
+                                <input type="hidden" name="nguoiNhanId" value="<%= ungVien._id %>">
+                            <% } else { %>
+                                <div class="form-group">
+                                    <label for="nguoiNhan">Chọn ứng viên</label>
+                                    <select class="form-control" id="nguoiNhan" name="nguoiNhanId" required>
+                                        <option value="">-- Chọn ứng viên --</option>
+                                        <% if (locals.danhSachUngVien && danhSachUngVien.length > 0) { %>
+                                            <% danhSachUngVien.forEach(ungVien => { %>
+                                                <option value="<%= ungVien._id %>"><%= ungVien.hoTen %> (<%= ungVien.email %>)</option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            <% } %>
+                            
+                            <div class="form-group">
+                                <label for="tieuDe">Tiêu đề</label>
+                                <input type="text" class="form-control" id="tieuDe" name="tieuDe" required 
+                                    <% if (locals.congViec) { %>
+                                        value="Thông báo về đơn ứng tuyển: <%= congViec.tenCV %>"
+                                    <% } %>
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="noiDung">Nội dung</label>
+                                <textarea class="form-control" id="noiDung" name="noiDung" rows="6" required></textarea>
+                            </div>
+                            
+                            <% if (locals.congViec) { %>
+                                <input type="hidden" name="congViecId" value="<%= congViec._id %>">
+                                <div class="related-job-info alert alert-info">
+                                    <h6 class="mb-2">Việc làm liên quan:</h6>
+                                    <p class="mb-0"><%= congViec.tenCV %> - <%= congViec.diaDiem %></p>
+                                </div>
+                            <% } else { %>
+                                <div class="form-group">
+                                    <label for="congViec">Việc làm liên quan (nếu có)</label>
+                                    <select class="form-control" id="congViec" name="congViecId">
+                                        <option value="">-- Không có --</option>
+                                        <% if (locals.danhSachCongViec && danhSachCongViec.length > 0) { %>
+                                            <% danhSachCongViec.forEach(congViec => { %>
+                                                <option value="<%= congViec._id %>"><%= congViec.tenCV %> - <%= congViec.diaDiem %></option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            <% } %>
+                            
+                            <div class="form-group d-flex justify-content-between mt-4">
+                                <a href="<%= locals.backUrl || '/quan-ly-ung-vien' %>" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left mr-2"></i>Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane mr-2"></i>Gửi thông báo
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        $('#sendMessageForm').submit(function(e) {
+            e.preventDefault();
+            
+            const formData = $(this).serialize();
+            
+            $.ajax({
+                url: '/gui-thong-bao',
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        alert('Gửi thông báo thành công!');
+                        window.location.href = '<%= locals.backUrl || "/quan-ly-ung-vien" %>';
+                    } else {
+                        alert('Lỗi: ' + (response.message || 'Không thể gửi thông báo'));
+                    }
+                },
+                error: function(error) {
+                    console.error(error);
+                    alert('Lỗi khi gửi thông báo. Vui lòng thử lại sau!');
+                }
+            });
+        });
+    });
+</script>

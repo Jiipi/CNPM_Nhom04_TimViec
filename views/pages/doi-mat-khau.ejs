@@ -1,0 +1,172 @@
+<%- contentFor('body') %>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow" style="max-width: 500px; width: 100%; background: #f7e9d7;">
+        <div class="card-body p-5">
+            <div class="text-center mb-4">
+                <img src="/images/logo.jpg" alt="MY JOB Logo" class="logo mb-3" style="max-width: 120px;">
+                <h4 class="font-weight-bold mb-3" style="color:#7c5c2b;">Tạo Mật Khẩu Mới</h4>
+                <p class="mb-4" style="color:#7c5c2b;">
+                    Vui lòng nhập mật khẩu mới cho tài khoản của bạn.<br>
+                    Mật khẩu mới phải có ít nhất 6 ký tự.
+                </p>
+            </div>
+
+            <!-- Thông báo lỗi hoặc thành công -->
+            <% if (typeof message !== 'undefined') { %>
+                <div class="alert alert-<%= messageType || 'info' %> mb-4">
+                    <%= message %>
+                    <% if (messageType === 'success') { %>
+                    <div class="mt-2">
+                        <a href="/dang-nhap" class="btn btn-sm btn-outline-success">Đăng nhập ngay</a>
+                    </div>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <% if (typeof token !== 'undefined' && token && typeof email !== 'undefined' && email) { %>
+                <form id="passwordResetForm" action="/api/tai-khoan/doi-mat-khau" method="POST">
+                    <input type="hidden" name="token" value="<%= token %>">
+                    <input type="hidden" name="email" value="<%= email %>">
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu mới</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" minlength="6" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">Mật khẩu phải có ít nhất 6 ký tự</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" minlength="6" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#confirmPassword">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">Mật khẩu xác nhận không khớp</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2 mb-3" id="submitBtn" style="background:#3b6cb7;">
+                        Đổi Mật Khẩu
+                    </button>
+                </form>
+            <% } %>
+
+            <div class="text-center mt-3">
+                <a href="/dang-nhap" class="text-decoration-none" style="color:#3b6cb7;">
+                    <i class="fas fa-arrow-left me-1"></i> Trở về trang đăng nhập
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('title') %>
+Đổi mật khẩu | MyJob
+
+<%- contentFor('extraCSS') %>
+<style>
+    .card {
+        border-radius: 15px;
+        border: none;
+    }
+    .form-control {
+        border-radius: 8px;
+        padding: 10px 15px;
+    }
+    .btn-primary {
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+    }
+    .toggle-password {
+        cursor: pointer;
+    }
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+    }
+</style>
+
+<%- contentFor('extraJS') %>
+<script>
+    $(document).ready(function() {
+        const passwordInput = $('#password');
+        const confirmInput = $('#confirmPassword');
+        const submitBtn = $('#submitBtn');
+        
+        // Xử lý hiển thị/ẩn mật khẩu
+        $('.toggle-password').on('click', function() {
+            const targetId = $(this).data('target');
+            const passwordField = $(targetId);
+            const icon = $(this).find('i');
+            
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        
+        // Kiểm tra mật khẩu khớp nhau
+        function validatePasswords() {
+            const password = passwordInput.val();
+            const confirm = confirmInput.val();
+            
+            if (password && confirm && password !== confirm) {
+                confirmInput.addClass('is-invalid');
+                return false;
+            } else {
+                confirmInput.removeClass('is-invalid');
+                return true;
+            }
+        }
+        
+        // Kiểm tra độ dài mật khẩu
+        function validatePasswordLength() {
+            const password = passwordInput.val();
+            
+            if (password && password.length < 6) {
+                passwordInput.addClass('is-invalid');
+                return false;
+            } else {
+                passwordInput.removeClass('is-invalid');
+                return true;
+            }
+        }
+        
+        // Theo dõi thay đổi mật khẩu
+        passwordInput.on('input', validatePasswordLength);
+        confirmInput.on('input', validatePasswords);
+        passwordInput.on('input', validatePasswords);
+        
+        // Xử lý form đổi mật khẩu
+        $('#passwordResetForm').submit(function(e) {
+            // Kiểm tra độ dài mật khẩu
+            if (!validatePasswordLength()) {
+                e.preventDefault();
+                alert('Mật khẩu phải có ít nhất 6 ký tự');
+                passwordInput.focus();
+                return false;
+            }
+            
+            // Kiểm tra mật khẩu khớp nhau
+            if (!validatePasswords()) {
+                e.preventDefault();
+                alert('Mật khẩu xác nhận không khớp với mật khẩu mới');
+                confirmInput.focus();
+                return false;
+            }
+            
+            // Hiển thị trạng thái loading
+            submitBtn.prop('disabled', true);
+            submitBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...');
+        });
+    });
+</script> 
